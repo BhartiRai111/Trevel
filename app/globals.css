@@ -244,3 +244,43 @@ footer p{font-size:14px;opacity:.8}
   .mobile-only{display:block}.desk-only,.who span,.who .btn{display:none}
   .links a{color:#fff}
 }
+
+/* ---------- itinerary, reviews, trips, admin ---------- */
+.stars.sm{font-size:16px;letter-spacing:1px;color:#e0a800}
+.facts .stars.sm{color:var(--gold)}
+.days{list-style:none;padding:0;display:grid;gap:14px;max-width:62ch}
+.days li{display:grid;grid-template-columns:64px 1fr;gap:14px;padding-bottom:14px;border-bottom:1px solid #d7ebe8}
+.dn{background:var(--teal);color:#fff;border-radius:10px;font-size:13px;font-weight:600;height:max-content;padding:4px 0;text-align:center}
+.days p{color:var(--muted);font-size:15px;margin-top:2px}
+.rev{list-style:none;padding:0;display:grid;gap:14px;max-width:62ch}
+.rev li{background:#fff;border-radius:14px;padding:14px 16px}
+.rev p{margin-top:4px}
+.detail.one{grid-template-columns:1fr;max-width:820px}
+.okmsg{background:#d4f5e4;color:#0b5a35}
+.bks{list-style:none;padding:0;display:grid;gap:14px}
+.bk{background:#fff;border-radius:18px;padding:18px;display:grid;gap:10px;box-shadow:0 8px 24px rgba(15,143,134,.08)}
+.bk-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bk-r{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.bk-act{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.bk-act .linkbtn{color:var(--teal-d)}
+.bk-act .linkbtn.danger{color:#b3261e}
+.linkbox{width:100%;border:2px solid #cfe5e2;border-radius:10px;padding:8px 10px;font:13px Poppins;color:var(--ink)}
+.rform{display:grid;gap:10px}
+.rform textarea,.aform textarea{border:2px solid #cfe5e2;border-radius:12px;padding:10px 12px;font:500 15px Poppins;width:100%;color:var(--ink);background:#fff}
+.pick{display:flex;gap:4px}
+.pick button{background:none;border:0;font-size:30px;color:#c9d8d6;cursor:pointer;line-height:1}
+.pick button.on{color:#e0a800}
+.st.paid{background:#cfe8ff;color:#0b3d73}
+.page.wide{max-width:1360px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:22px}
+.kpis div{background:#fff;border-radius:16px;padding:16px;display:flex;flex-direction:column}
+.kpis b{font-size:26px;color:var(--teal-d)}
+.kpis span{font-size:13px;color:var(--muted)}
+.fil{max-width:200px;margin-bottom:12px}
+.acts{white-space:nowrap}
+.acts .linkbtn{margin-right:12px;color:var(--teal-d)}
+.acts .linkbtn.danger{color:#b3261e}
+.aform{background:#fff;border-radius:18px;padding:22px;display:grid;gap:14px;max-width:760px}
+.row2{display:flex;gap:18px;align-items:center}
+.rev.admin li p{margin:4px 0 8px}
+@media(max-width:640px){.days li{grid-template-columns:1fr}.dn{width:60px}}

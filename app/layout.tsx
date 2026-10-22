@@ -4,6 +4,10 @@ import SiteProvider from '@/components/SiteProvider';
 import Navbar from '@/components/Navbar';
 import AuthModal from '@/components/AuthModal';
 import { Footer } from '@/components/HomeSections';
+import { allDestinations } from '@/lib/repo';
+
+// destinations come from the database, so pages are rendered per request
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: { default: 'Roamora | Travel India, your way', template: '%s | Roamora' },
@@ -21,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
       <body>
-        <SiteProvider>
+        <SiteProvider dests={allDestinations(true)}>
           <Navbar />
           {children}
           <Footer />

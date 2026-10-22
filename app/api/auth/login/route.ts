@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { startSession, verifyPassword } from '@/lib/auth';
+import { isAdminEmail, startSession, verifyPassword } from '@/lib/auth';
 
 export async function POST(req: Request) {
   const b = await req.json().catch(() => ({}));
@@ -10,5 +10,5 @@ export async function POST(req: Request) {
   if (!row || typeof b.password !== 'string' || !verifyPassword(b.password, row.password_hash))
     return NextResponse.json({ error: 'Email or password is wrong.' }, { status: 401 });
   await startSession(row.id);
-  return NextResponse.json({ user: { id: row.id, name: row.name, email: row.email, phone: row.phone } });
+  return NextResponse.json({ user: { id: row.id, name: row.name, email: row.email, phone: row.phone, isAdmin: isAdminEmail(row.email) } });
 }

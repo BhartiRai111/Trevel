@@ -1,9 +1,11 @@
 import Link from 'next/link';
-import { bySlug, img } from '@/lib/destinations';
+import { img } from '@/lib/destinations';
+import { allDestinations, getDestination } from '@/lib/repo';
 import { inr } from '@/lib/pricing';
 
 export function Featured() {
-  const d = bySlug('ladakh-leh')!;
+  const d = getDestination('ladakh-leh') ?? allDestinations(true)[0];
+  if (!d) return null;
   return (
     <section className="featured photo" id="featured" style={{ ['--img' as string]: `url('${img(d.img, 2000, 80)}')` }}>
       <div className="feat-in">

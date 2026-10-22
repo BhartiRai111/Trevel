@@ -81,7 +81,7 @@ export default function Hero() {
       </div>
 
       <div className="stats">
-        <div><b>12</b><span>Destinations</span></div>
+        <div><b>12+</b><span>Destinations</span></div>
         <div><b>GST</b><span>Shown upfront</span></div>
         <div><b>Free</b><span>Online cancellation</span></div>
       </div>

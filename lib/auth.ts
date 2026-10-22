@@ -5,7 +5,11 @@ import { db } from './db';
 const COOKIE = 'roamora_session';
 const DAYS = 30;
 
-export type User = { id: number; name: string; email: string; phone: string };
+export type User = { id: number; name: string; email: string; phone: string; isAdmin: boolean };
+
+/** Admins are the emails listed in the ADMIN_EMAILS environment variable (comma separated). */
+const adminEmails = () => (process.env.ADMIN_EMAILS ?? '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+export const isAdminEmail = (email: string) => adminEmails().includes(email.toLowerCase());
 
 export function hashPassword(pw: string) {
   const salt = crypto.randomBytes(16);
@@ -38,6 +42,11 @@ export async function currentUser(): Promise<User | null> {
   if (!token) return null;
   const row = db().prepare(
     'SELECT u.id, u.name, u.email, u.phone FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ? AND s.expires_at > ?'
-  ).get(sha(token), Date.now()) as User | undefined;
-  return row ?? null;
+  ).get(sha(token), Date.now()) as unknown as Omit<User, 'isAdmin'> | undefined;
+  return row ? { ...row, isAdmin: isAdminEmail(row.email) } : null;
+}
+
+export async function requireAdmin(): Promise<User | null> {
+  const u = await currentUser();
+  return u?.isAdmin ? u : null;
 }

@@ -1,10 +1,12 @@
 'use client';
+import type { Destination } from '@/lib/destinations';
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 
-export type User = { id: number; name: string; email: string; phone: string };
+export type User = { id: number; name: string; email: string; phone: string; isAdmin: boolean };
 type AuthMode = 'login' | 'register' | null;
 
 type Ctx = {
+  dests: Destination[];
   user: User | null;
   ready: boolean;
   saved: Set<string>;
@@ -24,7 +26,7 @@ export function useSite() {
   return c;
 }
 
-export default function SiteProvider({ children }: { children: ReactNode }) {
+export default function SiteProvider({ children, dests }: { children: ReactNode; dests: Destination[] }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const [saved, setSaved] = useState<Set<string>>(new Set());
@@ -67,7 +69,7 @@ export default function SiteProvider({ children }: { children: ReactNode }) {
   }, [user, saved, refresh]);
 
   return (
-    <SiteContext.Provider value={{ user, ready, saved, authMode, openAuth: (m = 'login') => setAuthMode(m), closeAuth: () => setAuthMode(null), refresh, logout, toggleSave }}>
+    <SiteContext.Provider value={{ dests, user, ready, saved, authMode, openAuth: (m = 'login') => setAuthMode(m), closeAuth: () => setAuthMode(null), refresh, logout, toggleSave }}>
       {children}
     </SiteContext.Provider>
   );

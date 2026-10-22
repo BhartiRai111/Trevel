@@ -23,6 +23,7 @@ export default function Navbar() {
       <nav className={`links${open ? ' open' : ''}`} onClick={() => setOpen(false)}>
         <Link href="/search">Destinations</Link>
         <Link href="/trips">My trips</Link>
+        {user?.isAdmin && <Link href="/admin">Admin</Link>}
         {ready && (user
           ? <button className="linkbtn mobile-only" type="button" onClick={logout}>Log out</button>
           : <button className="linkbtn mobile-only" type="button" onClick={() => openAuth('login')}>Log in</button>)}

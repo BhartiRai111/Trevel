@@ -1,12 +1,14 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
-import { DESTINATIONS, TYPE_LABEL, type DestType } from '@/lib/destinations';
+import { TYPE_LABEL, type DestType } from '@/lib/destinations';
 import DestinationCard from './DestinationCard';
+import { useSite } from './SiteProvider';
 
 export default function HomePlaces() {
+  const { dests } = useSite();
   const [f, setF] = useState<'all' | DestType>('all');
-  const list = DESTINATIONS.filter(d => f === 'all' || d.type === f).slice(0, 8);
+  const list = dests.filter(d => f === 'all' || d.type === f).slice(0, 8);
   return (
     <section className="section" id="places">
       <div className="head"><p className="eyebrow dark">Popular places</p><h2>Where will you go next?</h2></div>

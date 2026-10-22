@@ -1,8 +1,14 @@
 import type { DatabaseSync } from 'node:sqlite';
 import fs from 'node:fs';
 import path from 'node:path';
+import { SEED } from './destinations';
 
 const g = globalThis as unknown as { __roamoraDb?: DatabaseSync };
+
+function addCol(d: DatabaseSync, table: string, col: string, def: string) {
+  const cols = d.prepare(`PRAGMA table_info(${table})`).all() as unknown as { name: string }[];
+  if (!cols.some(c => c.name === col)) d.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`);
+}
 
 /** SQLite file at ./data/roamora.db (Node's built-in sqlite, no extra package). */
 export function db(): DatabaseSync {
@@ -35,7 +41,36 @@ export function db(): DatabaseSync {
       base INTEGER NOT NULL, gst INTEGER NOT NULL, total INTEGER NOT NULL,
       status TEXT NOT NULL DEFAULT 'requested', created_at INTEGER NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS destinations (
+      slug TEXT PRIMARY KEY, name TEXT NOT NULL, state TEXT NOT NULL, type TEXT NOT NULL,
+      days INTEGER NOT NULL, price INTEGER NOT NULL, best_time TEXT NOT NULL, tagline TEXT NOT NULL,
+      about TEXT NOT NULL, highlights TEXT NOT NULL, itinerary TEXT NOT NULL, img TEXT NOT NULL,
+      active INTEGER NOT NULL DEFAULT 1, sort INTEGER NOT NULL DEFAULT 0
+    );
+    CREATE TABLE IF NOT EXISTS payments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      booking_id INTEGER NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+      order_id TEXT NOT NULL UNIQUE, payment_id TEXT, amount INTEGER NOT NULL,
+      status TEXT NOT NULL DEFAULT 'created', created_at INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS reviews (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      booking_id INTEGER NOT NULL UNIQUE REFERENCES bookings(id) ON DELETE CASCADE,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      slug TEXT NOT NULL, rating INTEGER NOT NULL, text TEXT NOT NULL,
+      hidden INTEGER NOT NULL DEFAULT 0, created_at INTEGER NOT NULL
+    );
   `);
+  addCol(d, 'bookings', 'share_token', 'TEXT');
+  addCol(d, 'bookings', 'paid_at', 'INTEGER');
+  d.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_bookings_share ON bookings(share_token) WHERE share_token IS NOT NULL');
+
+  const n = (d.prepare('SELECT COUNT(*) AS n FROM destinations').get() as unknown as { n: number }).n;
+  if (n === 0) {
+    const ins = d.prepare('INSERT INTO destinations (slug,name,state,type,days,price,best_time,tagline,about,highlights,itinerary,img,active,sort) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+    SEED.forEach((x, i) => ins.run(x.slug, x.name, x.state, x.type, x.days, x.price, x.bestTime, x.tagline, x.about,
+      JSON.stringify(x.highlights), JSON.stringify(x.itinerary), x.img, 1, i));
+  }
   g.__roamoraDb = d;
   return d;
 }

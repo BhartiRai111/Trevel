@@ -12,18 +12,24 @@ export type Destination = {
   tagline: string;
   about: string;
   highlights: string[];
-  img: string; // Unsplash photo id, see img() below
+  /** Unsplash photo id, or a full https image URL */
+  img: string;
+  itinerary: { title: string; text: string }[];
+  active: boolean;
 };
 
 export const TYPE_LABEL: Record<DestType, string> = {
   mountain: 'Mountains', beach: 'Beaches', heritage: 'Heritage', spiritual: 'Spiritual', nature: 'Nature & Adventure'
 };
 
-export const img = (id: string, w = 900, q = 75) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=${q}`;
+export const img = (id: string, w = 900, q = 75) =>
+  /^https?:\/\//.test(id) ? id : `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=${q}`;
 
 export const INCLUSIONS = ['Hotel stay with breakfast', 'Local guide', 'Airport / station pickup and drop', 'All local transfers'];
 
-export const DESTINATIONS: Destination[] = [
+type Raw = Omit<Destination, 'itinerary' | 'active'>;
+
+const RAW: Raw[] = [
   { slug: 'ladakh-leh', name: 'Leh Ladakh', state: 'Ladakh', type: 'mountain', days: 7, price: 32000, bestTime: 'Jun to Sep', img: 'photo-1626015365107-2cfd4e8e3e19',
     tagline: 'High passes, blue lakes and monasteries.', about: 'A week above 3,000 metres: Leh town, Nubra Valley, Pangong Lake and the monasteries in between. Days are planned slowly so your body can adjust to the altitude.',
     highlights: ['Pangong Lake at sunrise', 'Khardung La pass', 'Nubra Valley sand dunes', 'Thiksey Monastery'] },
@@ -62,4 +68,21 @@ export const DESTINATIONS: Destination[] = [
     highlights: ['Alleppey houseboat night', 'Munnar tea gardens', 'Fort Kochi', 'Spice plantation walk'] }
 ];
 
-export const bySlug = (slug: string) => DESTINATIONS.find(d => d.slug === slug);
+
+/** Simple day-by-day plan built from the highlights. Admin can edit it per destination. */
+export function makeItinerary(d: Pick<Raw, 'name' | 'days' | 'highlights'>) {
+  const out: { title: string; text: string }[] = [];
+  for (let i = 0; i < d.days; i++) {
+    if (i === 0) out.push({ title: `Arrive in ${d.name}`, text: 'Pickup from the airport or station, hotel check-in and a relaxed evening to settle in.' });
+    else if (i === d.days - 1) out.push({ title: 'Departure', text: 'Breakfast, check-out and drop to the airport or station.' });
+    else {
+      const h = d.highlights[i - 1];
+      out.push(h ? { title: h, text: `Guided visit: ${h}. Lunch and rest breaks are planned around it.` }
+        : { title: 'Free day', text: 'Explore at your own pace, or add an optional activity with your guide.' });
+    }
+  }
+  return out;
+}
+
+/** Starting data. It is copied into the database the first time the app runs; after that, edit it from /admin. */
+export const SEED: Destination[] = RAW.map(d => ({ ...d, active: true, itinerary: makeItinerary(d) }));

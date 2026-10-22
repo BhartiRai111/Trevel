@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { hashPassword, startSession } from '@/lib/auth';
+import { hashPassword, isAdminEmail, startSession } from '@/lib/auth';
 import { cleanName, cleanPhone, isEmail } from '@/lib/validate';
 
 export async function POST(req: Request) {
@@ -19,5 +19,5 @@ export async function POST(req: Request) {
   const r = db().prepare('INSERT INTO users (name, email, phone, password_hash, created_at) VALUES (?, ?, ?, ?, ?)')
     .run(name, email, phone, hashPassword(b.password), Date.now());
   await startSession(Number(r.lastInsertRowid));
-  return NextResponse.json({ user: { id: Number(r.lastInsertRowid), name, email, phone } });
+  return NextResponse.json({ user: { id: Number(r.lastInsertRowid), name, email, phone, isAdmin: isAdminEmail(email) } });
 }
