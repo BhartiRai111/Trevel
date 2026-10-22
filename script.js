@@ -29,10 +29,34 @@ $('#filters').addEventListener('click', e => {
   document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === b));
   draw(b.dataset.f, $('#q').value);
 });
+/* glass booking tabs */
+const TABS = {
+  tours:   { go: 'Search tours',   f: [['Where to?', 'text', 'Hill Track, Bali, Swiss Alps'], ['When', 'date'], ['Travellers', 'sel', ['1 person', '2 people', '3–5 people', '6+ people']]] },
+  hotels:  { go: 'Search hotels',  f: [['Destination', 'text', 'City or resort'], ['Check-in', 'date'], ['Check-out', 'date'], ['Guests', 'sel', ['1 guest', '2 guests', '3–4 guests', '5+ guests']]] },
+  flights: { go: 'Search flights', f: [['From', 'text', 'Delhi'], ['To', 'text', 'Bali'], ['Depart', 'date'], ['Passengers', 'sel', ['1 adult', '2 adults', '3–5 people']]] },
+  cars:    { go: 'Search cars',    f: [['Pick-up city', 'text', 'Honolulu'], ['Pick-up date', 'date'], ['Return date', 'date'], ['Car type', 'sel', ['Any', 'Hatchback', 'SUV', 'Jeep']]] }
+};
+let tab = 'tours';
+function drawForm() {
+  const t = TABS[tab], form = $('#search');
+  form.className = 'search n' + (t.f.length === 3 ? 3 : 4);
+  form.innerHTML = t.f.map(([l, ty, o], i) => `<label><span>${l}</span>${
+    ty === 'sel' ? `<select aria-label="${l}">${o.map(x => `<option>${x}</option>`).join('')}</select>`
+    : `<input ${i === 0 && ty === 'text' ? 'id="q"' : ''} type="${ty}" ${ty === 'text' ? `placeholder="${o}"` : ''} aria-label="${l}">`}</label>`).join('')
+    + `<button class="btn btn-gold" type="submit">${t.go}</button>`;
+}
+drawForm();
+$('#tabs').addEventListener('click', e => {
+  const b = e.target.closest('.tab'); if (!b) return;
+  tab = b.dataset.k;
+  document.querySelectorAll('.tab').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-selected', on); });
+  drawForm();
+});
 $('#search').addEventListener('submit', e => {
   e.preventDefault();
+  const q = $('#q') ? $('#q').value : '';
   document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c.dataset.f === 'all'));
-  draw('all', $('#q').value);
+  draw('all', tab === 'tours' ? q : '');
   $('#places').scrollIntoView({ behavior: 'smooth' });
 });
 cards.addEventListener('click', e => { if (e.target.closest('.card')) openBook(e.target.closest('.card').dataset.name); });

@@ -135,3 +135,23 @@ footer p{font-size:14px;opacity:.8}
 .hero .bg video.ready{opacity:1}
 @keyframes kb{from{transform:scale(1)}to{transform:scale(1.12)}}
 @media(prefers-reduced-motion:reduce){.hero .slide.on{animation:none}}
+
+
+/* Template 5: Glass Tabs hero (centered, slow pan background) */
+.hero{align-items:center;text-align:center}
+.hero-in{max-width:860px;margin-inline:auto;display:flex;flex-direction:column;align-items:center}
+.hero .lead{margin-inline:auto}
+.hero .slide.on{animation:panx 14s ease-in-out infinite alternate}
+@keyframes panx{from{transform:scale(1.15) translateX(-3%)}to{transform:scale(1.15) translateX(3%)}}
+.hero::after{background:radial-gradient(circle at 50% 40%,rgba(15,143,134,.35),rgba(7,58,55,.92))}
+.stats{justify-content:center}
+.glass{width:100%;margin-top:28px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.38);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:26px;padding:14px;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto}
+.tab{font:600 14px Poppins;border:0;border-radius:12px;padding:10px 22px;cursor:pointer;background:rgba(255,255,255,.14);color:#fff;white-space:nowrap}
+.tab.on{background:#fff;color:var(--teal-d)}
+.tab:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.glass .search{margin-top:0;box-shadow:none;border-radius:18px;max-width:none;text-align:left}
+.glass .search.n3{grid-template-columns:2fr 1.2fr 1.2fr auto}
+.glass .search.n4{grid-template-columns:1.4fr 1.4fr 1.1fr 1.1fr auto}
+@media(max-width:860px){.glass .search.n3,.glass .search.n4{grid-template-columns:1fr 1fr}
+ .glass .search label:first-child{grid-column:1/-1}.glass .search .btn{grid-column:1/-1}}

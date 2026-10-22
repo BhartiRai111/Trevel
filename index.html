@@ -37,15 +37,17 @@
     </div>
     <div class="hero-in">
       <p class="eyebrow">Explore · Discover · Roam</p>
-      <h1>Travel the world,<br>your way.</h1>
-      <p class="lead">National parks, quiet beaches and mountain trails. Pick a place, invite your friends and book in minutes.</p>
-      <form class="search" id="search">
-        <label><span>Where to?</span><input id="q" type="text" placeholder="Hill Track, Bali, Swiss Alps" aria-label="Destination"></label>
-        <label><span>When</span><input type="date" aria-label="Date"></label>
-        <label><span>Travellers</span>
-          <select aria-label="Travellers"><option>1 person</option><option selected>2 people</option><option>3–5 people</option><option>6+ people</option></select></label>
-        <button class="btn btn-gold" type="submit">Search</button>
-      </form>
+      <h1>Everything for<br>your trip.</h1>
+      <p class="lead">Search tours, hotels, flights and cars in one place.</p>
+      <div class="glass" id="booking">
+        <div class="tabs" id="tabs" role="tablist" aria-label="Booking type">
+          <button class="tab on" role="tab" aria-selected="true" data-k="tours" type="button">Tours</button>
+          <button class="tab" role="tab" aria-selected="false" data-k="hotels" type="button">Hotels</button>
+          <button class="tab" role="tab" aria-selected="false" data-k="flights" type="button">Flights</button>
+          <button class="tab" role="tab" aria-selected="false" data-k="cars" type="button">Cars</button>
+        </div>
+        <form class="search" id="search"></form>
+      </div>
     </div>
     <div class="stats">
       <div><b>120+</b><span>Destinations</span></div>
