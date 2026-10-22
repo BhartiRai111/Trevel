@@ -55,6 +55,22 @@ const SCHEMA = `
   );
   CREATE TABLE IF NOT EXISTS rate_hits (key TEXT NOT NULL, ts BIGINT NOT NULL);
   CREATE INDEX IF NOT EXISTS idx_rate_hits ON rate_hits(key, ts);
+  CREATE TABLE IF NOT EXISTS hotels (
+    slug TEXT PRIMARY KEY, name TEXT NOT NULL, city TEXT NOT NULL, state TEXT NOT NULL, stars INTEGER NOT NULL, price INTEGER NOT NULL,
+    amenities TEXT NOT NULL, about TEXT NOT NULL, img TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, sort INTEGER NOT NULL DEFAULT 0
+  );
+  CREATE TABLE IF NOT EXISTS flights (
+    slug TEXT PRIMARY KEY, airline TEXT NOT NULL, flight_no TEXT NOT NULL, from_city TEXT NOT NULL, to_city TEXT NOT NULL, dep TEXT NOT NULL,
+    duration INTEGER NOT NULL, price INTEGER NOT NULL, days TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, sort INTEGER NOT NULL DEFAULT 0
+  );
+  CREATE TABLE IF NOT EXISTS cars (
+    slug TEXT PRIMARY KEY, name TEXT NOT NULL, type TEXT NOT NULL, city TEXT NOT NULL, seats INTEGER NOT NULL, price INTEGER NOT NULL,
+    about TEXT NOT NULL, img TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, sort INTEGER NOT NULL DEFAULT 0
+  );
+  ALTER TABLE bookings ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'tour';
+  ALTER TABLE bookings ADD COLUMN IF NOT EXISTS end_date TEXT;
+  ALTER TABLE bookings ADD COLUMN IF NOT EXISTS units INTEGER NOT NULL DEFAULT 1;
+  ALTER TABLE bookings ADD COLUMN IF NOT EXISTS title TEXT;
   CREATE TABLE IF NOT EXISTS reviews (
     id SERIAL PRIMARY KEY, booking_id INTEGER NOT NULL UNIQUE REFERENCES bookings(id) ON DELETE CASCADE,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, slug TEXT NOT NULL, rating INTEGER NOT NULL,
@@ -113,6 +129,8 @@ async function init(): Promise<Backend> {
         );
     });
   }
+  const { seedCatalog } = await import('./catalog'); // loaded here to avoid a circular import
+  await seedCatalog(wrap(b));
   return b;
 }
 

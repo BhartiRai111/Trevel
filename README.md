@@ -18,6 +18,12 @@ Needs Node 20.9 or newer.
 - Works on Vercel, Netlify and other serverless hosts as long as `DATABASE_URL` points to a hosted Postgres. Use the provider's pooled connection string on serverless, and set `PG_POOL_MAX=1` or `2` there.
 
 ## Features
+**Four things to book:** tours, hotels, flights and cars with driver. The tabs on the home page open the matching search.
+- **Hotels** (`/hotels`): search by city or name, dates, guests, stars and price. Total for the stay with GST shown. GST follows the room rate: up to ₹1,000 nil, ₹1,001 to ₹7,500 12%, above ₹7,500 18%. Up to 3 guests per room, up to 5 rooms.
+- **Flights** (`/flights`): search by from, to and date; only flights that operate on that weekday are shown, and if there are none you see which days it does run. Economy fare per person plus 5% GST, up to 9 passengers.
+- **Cars with driver** (`/cars`): search by city, dates and type. Rate per day (driver, fuel and tolls for 250 km a day included) plus 5% GST.
+- Every booking is a request: `requested` → `confirmed` by you → `paid`. Prices are always recalculated on the server. All four kinds show up in My trips, in emails and in the admin booking list.
+
 **Travellers**
 - Search and filter destinations; destination pages with highlights, a day-by-day plan, reviews and a live price breakdown (base + 5% GST + ₹0 fee = total).
 - Sign up / log in (email + password, Indian mobile number validated). Save places. Send booking requests.
@@ -38,6 +44,7 @@ Needs Node 20.9 or newer.
 
 **Admin (`/admin`)**
 - Bookings: confirm requests, mark offline payments as paid, cancel. Counts and paid revenue at the top.
+- Hotels, Flights and Cars tabs: add, edit and hide listings, rates, schedules (days of the week and times).
 - Destinations: add, edit, hide. Price, days, text, image, highlights and the day-by-day plan. Existing bookings keep the price they were made at.
 - Reviews: hide or show.
 
@@ -51,8 +58,9 @@ Needs Node 20.9 or newer.
 `requested` (traveller sends request) → `confirmed` (admin checks availability) → `paid` (Razorpay or admin marks paid). A traveller can cancel `requested` and `confirmed` bookings. Paid bookings must be cancelled by an admin, and refunds are done from the Razorpay dashboard (not automated).
 
 ## Before going live
+- **Flights, hotels and cars are sample data.** The airlines (SkyIndia, Deccan Wings), flight numbers, hotels and car rates are made up so you can try the whole flow. Replace them in `/admin` with your real inventory. The site does not connect to airline or hotel systems, so seats and rooms are confirmed by your team after each request. Live fares and instant ticketing would need a partner API (for example Amadeus or a travel consolidator).
 - Sample prices, plans and photos are placeholders. Edit them in `/admin` (photos are Unsplash ids or any https image link).
-- Not built yet: SMS and automatic WhatsApp messages (WhatsApp Business API), trip reminder emails, automatic refunds, Hotels / Flights / Cars search.
+- Not built yet: SMS and automatic WhatsApp messages (WhatsApp Business API), trip reminder emails, automatic refunds, live airline and hotel inventory (partner APIs), reviews for hotels and cars.
 - Email sending was tested against a local test mail server, not against Gmail or another provider. Send yourself a test booking after you add your SMTP settings.
 - Back up your database (most providers do this daily; check yours). Use SSL in `DATABASE_URL` (`?sslmode=require`) for hosted databases.
 - Razorpay calls could not be tested against the live API from the build environment. The payment signature check, webhook and booking status changes were tested; do a test-mode payment before going live.

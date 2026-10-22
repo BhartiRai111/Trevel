@@ -5,7 +5,9 @@ import { inr } from '@/lib/pricing';
 import DestinationCard from '@/components/DestinationCard';
 import { useSite } from '@/components/SiteProvider';
 
-type B = { id: number; ref: string; slug: string; name: string; travel_date: string; travellers: number; total: number; status: string; share_token: string | null; can_review: boolean; reviewed: boolean };
+type B = { id: number; ref: string; kind: string; href: string; slug: string; name: string; travel_date: string; end_date: string | null; travellers: number; total: number; status: string; share_token: string | null; can_review: boolean; reviewed: boolean };
+const KIND: Record<string, string> = { tour: 'Tour', hotel: 'Hotel', flight: 'Flight', car: 'Car' };
+const fmt = (d: string) => new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 const STATUS: Record<string, string> = { requested: 'Requested', confirmed: 'Confirmed', paid: 'Paid', cancelled: 'Cancelled' };
 
 type RzpResponse = { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string };
@@ -108,21 +110,21 @@ export default function TripsClient() {
         : <ul className="bks">{bookings.map(b => (
           <li key={b.id} className="bk">
             <div className="bk-top">
-              <div><Link href={`/destinations/${b.slug}`}><b>{b.name}</b></Link><div className="muted">{b.ref} · {new Date(b.travel_date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} · {b.travellers} {b.travellers === 1 ? 'person' : 'people'}</div></div>
+              <div><Link href={b.href}><b>{b.name}</b></Link> <span className="tag2">{KIND[b.kind] ?? 'Tour'}</span><div className="muted">{b.ref} · {fmt(b.travel_date)}{b.end_date ? ` to ${fmt(b.end_date)}` : ''} · {b.travellers} {b.kind === 'flight' ? (b.travellers === 1 ? 'passenger' : 'passengers') : b.kind === 'hotel' ? (b.travellers === 1 ? 'guest' : 'guests') : (b.travellers === 1 ? 'person' : 'people')}</div></div>
               <div className="bk-r"><b>{inr(b.total)}</b><span className={`st ${b.status}`}>{STATUS[b.status] ?? b.status}</span></div>
             </div>
             {b.status === 'requested' && <p className="muted">We will check availability and confirm. You can pay after that.</p>}
             {b.status === 'confirmed' && !payEnabled && <p className="muted">Confirmed. We will share the payment details with you.</p>}
             <div className="bk-act">
               {b.status === 'confirmed' && payEnabled && <button className="btn btn-dark inline" type="button" onClick={() => pay(b)}>Pay {inr(b.total)}</button>}
-              {b.status !== 'cancelled' && (b.share_token || links[b.id]
+              {b.kind === 'tour' && b.status !== 'cancelled' && (b.share_token || links[b.id]
                 ? <><button className="linkbtn" type="button" onClick={() => share(b)}>Copy share link</button><button className="linkbtn" type="button" onClick={() => unshare(b)}>Stop sharing</button></>
                 : <button className="linkbtn" type="button" onClick={() => share(b)}>Share trip plan</button>)}
               {b.can_review && <button className="linkbtn" type="button" onClick={() => setReviewing(reviewing === b.id ? null : b.id)}>Write a review</button>}
               {b.reviewed && <span className="muted">Reviewed ✓</span>}
               {(b.status === 'requested' || b.status === 'confirmed') && <button className="linkbtn danger" type="button" onClick={() => cancel(b.id)}>Cancel</button>}
             </div>
-            {(links[b.id] || b.share_token) && <input className="linkbox" readOnly aria-label="Share link" value={links[b.id] ?? `${typeof location !== 'undefined' ? location.origin : ''}/share/${b.share_token}`} onFocus={e => e.currentTarget.select()} />}
+            {b.kind === 'tour' && (links[b.id] || b.share_token) && <input className="linkbox" readOnly aria-label="Share link" value={links[b.id] ?? `${typeof location !== 'undefined' ? location.origin : ''}/share/${b.share_token}`} onFocus={e => e.currentTarget.select()} />}
             {reviewing === b.id && (
               <form className="rform" onSubmit={e => review(e, b)}>
                 <div className="pick" role="radiogroup" aria-label="Rating">{[1, 2, 3, 4, 5].map(n => (

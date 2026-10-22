@@ -289,3 +289,30 @@ footer p{font-size:14px;opacity:.8}
 .vbar{position:fixed;left:12px;right:12px;bottom:12px;z-index:60;max-width:560px;margin-inline:auto;background:#073a37;color:#fff;border-radius:14px;padding:10px 14px;display:flex;gap:14px;align-items:center;justify-content:space-between;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
 .vbar .linkbtn{color:var(--gold);white-space:nowrap}
 .fp{margin:-4px 0 12px;text-align:right}
+
+/* ---------- hotels, flights, cars ---------- */
+.sform{background:#fff;border-radius:18px;padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end;margin-bottom:16px;box-shadow:0 8px 24px rgba(15,143,134,.1)}
+.rlist,.flist{list-style:none;padding:0;display:grid;gap:16px}
+.rcard{background:#fff;border-radius:18px;overflow:hidden;display:grid;grid-template-columns:260px 1fr;box-shadow:0 8px 24px rgba(15,143,134,.1)}
+.rimg{background:linear-gradient(135deg,#0f8f86,#073a37) center/cover;min-height:170px}
+.rbody{padding:16px 20px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.rbody h2{font-size:20px;margin:0 0 2px}
+.chips2{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chips2 span{background:#e3f3f1;color:var(--teal-d);font-size:12px;padding:2px 10px;border-radius:99px}
+.rprice{display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:right}
+.rprice>b,.rprice div b{font-size:20px;color:var(--teal-d)}
+.rprice .btn{margin-top:8px}
+.frow{background:#fff;border-radius:16px;padding:14px 18px;display:grid;grid-template-columns:1.2fr .7fr 1.4fr .7fr 1.2fr auto;gap:14px;align-items:center;box-shadow:0 8px 24px rgba(15,143,134,.08)}
+.fair,.ftime{display:flex;flex-direction:column}
+.ftime b{font-size:22px}
+.fmid{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px}
+.fmid i{display:block;width:100%;height:2px;background:linear-gradient(90deg,var(--teal),var(--teal-d));border-radius:2px}
+.fdays{grid-column:1/-1;margin:-6px 0 0}
+.dhero.fl{background-image:none}
+.dhero.fl::before{background:linear-gradient(135deg,#0a4f4b,#0f8f86 60%,#7cc6fe)}
+.tag2{background:#e3f3f1;color:var(--teal-d);font-size:11px;padding:1px 8px;border-radius:99px;font-weight:600;vertical-align:middle}
+.sform .btn{width:100%}
+@media(max-width:860px){
+  .rcard{grid-template-columns:1fr}.rimg{min-height:150px}.rprice{align-items:flex-start;text-align:left}
+  .frow{grid-template-columns:1fr 1fr;gap:10px}.fmid{grid-column:1/-1;order:3}.frow .rprice{grid-column:1/2}
+}

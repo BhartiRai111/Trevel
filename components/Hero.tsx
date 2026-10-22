@@ -2,24 +2,26 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { img } from '@/lib/destinations';
+import { CAR_TYPES, CITIES } from '@/lib/catalogMeta';
 
 const SLIDES = ['photo-1564507592333-c60657eea523', 'photo-1602216056096-3b40cc0c9944', 'photo-1512343879784-a960bf40e7f2', 'photo-1626015365107-2cfd4e8e3e19'];
 
-type Field = { label: string; kind: 'text' | 'date' | 'select'; hint?: string; options?: string[] };
-const TABS: Record<string, { label: string; go: string; live: boolean; fields: Field[] }> = {
-  tours: { label: 'Tours', go: 'Search tours', live: true, fields: [
-    { label: 'Where to?', kind: 'text', hint: 'Goa, Ladakh, Jaipur' },
-    { label: 'When', kind: 'date' },
-    { label: 'Travellers', kind: 'select', options: ['1 person', '2 people', '3–5 people', '6+ people'] }] },
-  hotels: { label: 'Hotels', go: 'Search hotels', live: false, fields: [
-    { label: 'Destination', kind: 'text', hint: 'City or resort' }, { label: 'Check-in', kind: 'date' }, { label: 'Check-out', kind: 'date' },
-    { label: 'Guests', kind: 'select', options: ['1 guest', '2 guests', '3–4 guests', '5+ guests'] }] },
-  flights: { label: 'Flights', go: 'Search flights', live: false, fields: [
-    { label: 'From', kind: 'text', hint: 'Delhi' }, { label: 'To', kind: 'text', hint: 'Goa' }, { label: 'Depart', kind: 'date' },
-    { label: 'Passengers', kind: 'select', options: ['1 adult', '2 adults', '3–5 people'] }] },
-  cars: { label: 'Cars', go: 'Search cars', live: false, fields: [
-    { label: 'Pick-up city', kind: 'text', hint: 'Jaipur' }, { label: 'Pick-up date', kind: 'date' }, { label: 'Return date', kind: 'date' },
-    { label: 'Car type', kind: 'select', options: ['Any', 'Hatchback', 'SUV', 'Tempo Traveller'] }] }
+type Field = { name: string; label: string; kind: 'text' | 'date' | 'select'; hint?: string; cities?: boolean; options?: [string, string][] };
+const people = (word: string): [string, string][] => [1, 2, 3, 4, 5, 6].map(n => [String(n), `${n} ${word}${n > 1 ? 's' : ''}`]);
+
+const TABS: Record<string, { label: string; go: string; path: string; fields: Field[] }> = {
+  tours: { label: 'Tours', go: 'Search tours', path: '/search', fields: [
+    { name: 'q', label: 'Where to?', kind: 'text', hint: 'Goa, Ladakh, Jaipur' }, { name: 'date', label: 'When', kind: 'date' },
+    { name: 'pax', label: 'Travellers', kind: 'select', options: people('person').map(([v, l]) => [v, l.replace('persons', 'people')]) }] },
+  hotels: { label: 'Hotels', go: 'Search hotels', path: '/hotels', fields: [
+    { name: 'city', label: 'Destination', kind: 'text', hint: 'City or hotel', cities: true }, { name: 'checkin', label: 'Check-in', kind: 'date' }, { name: 'checkout', label: 'Check-out', kind: 'date' },
+    { name: 'guests', label: 'Guests', kind: 'select', options: people('guest') }] },
+  flights: { label: 'Flights', go: 'Search flights', path: '/flights', fields: [
+    { name: 'from', label: 'From', kind: 'text', hint: 'Delhi', cities: true }, { name: 'to', label: 'To', kind: 'text', hint: 'Goa', cities: true }, { name: 'date', label: 'Depart', kind: 'date' },
+    { name: 'pax', label: 'Passengers', kind: 'select', options: people('passenger') }] },
+  cars: { label: 'Cars', go: 'Search cars', path: '/cars', fields: [
+    { name: 'city', label: 'Pick-up city', kind: 'text', hint: 'Jaipur', cities: true }, { name: 'from', label: 'Pick-up date', kind: 'date' }, { name: 'to', label: 'Return date', kind: 'date' },
+    { name: 'type', label: 'Car type', kind: 'select', options: [['', 'Any'], ...CAR_TYPES.map(t => [t, t] as [string, string])] }] }
 };
 
 export default function Hero() {
@@ -29,6 +31,7 @@ export default function Hero() {
   const [video, setVideo] = useState(true);
   const [note, setNote] = useState('');
   const t = TABS[tab];
+  const tomorrow = new Date(Date.now() + 864e5).toISOString().slice(0, 10);
 
   useEffect(() => {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -38,9 +41,14 @@ export default function Hero() {
 
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!t.live) { setNote(`${t.label} booking is coming soon. Tours are open now.`); return; }
-    const q = String(new FormData(e.currentTarget).get('f0') ?? '').trim();
-    router.push(q ? `/search?q=${encodeURIComponent(q)}` : '/search');
+    const f = new FormData(e.currentTarget);
+    const get = (k: string) => String(f.get(k) ?? '').trim();
+    if (tab === 'hotels' && get('checkin') && get('checkout') && get('checkout') <= get('checkin')) { setNote('Check-out must be after check-in.'); return; }
+    if (tab === 'flights' && get('from') && get('from').toLowerCase() === get('to').toLowerCase()) { setNote('Choose two different cities.'); return; }
+    if (tab === 'cars' && get('from') && get('to') && get('to') < get('from')) { setNote('Return date cannot be before pick-up.'); return; }
+    const p = new URLSearchParams();
+    t.fields.forEach(x => { const v = get(x.name); if (v) p.set(x.name, v); });
+    router.push(p.size ? `${t.path}?${p}` : t.path);
   }
 
   return (
@@ -58,7 +66,7 @@ export default function Hero() {
       <div className="hero-in">
         <p className="eyebrow">Incredible India</p>
         <h1>Plan your next<br />Indian trip.</h1>
-        <p className="lead">Tours with the final price, GST included, shown before you book.</p>
+        <p className="lead">Tours, hotels, flights and cars, with the final price and GST shown before you book.</p>
 
         <div className="glass">
           <div className="tabs" role="tablist" aria-label="Booking type">
@@ -67,21 +75,22 @@ export default function Hero() {
             ))}
           </div>
           <form className={`search n${t.fields.length}`} onSubmit={submit} key={tab}>
-            {t.fields.map((f, i) => (
-              <label key={f.label}><span>{f.label}</span>
+            {t.fields.map(f => (
+              <label key={f.name}><span>{f.label}</span>
                 {f.kind === 'select'
-                  ? <select name={`f${i}`} aria-label={f.label} defaultValue={f.options![1] ?? f.options![0]}>{f.options!.map(o => <option key={o}>{o}</option>)}</select>
-                  : <input name={`f${i}`} type={f.kind} placeholder={f.hint} aria-label={f.label} />}
+                  ? <select name={f.name} aria-label={f.label} defaultValue={f.options![1]?.[0] ?? f.options![0][0]}>{f.options!.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
+                  : <input name={f.name} type={f.kind} placeholder={f.hint} aria-label={f.label} list={f.cities ? 'city-list' : undefined} min={f.kind === 'date' ? tomorrow : undefined} autoComplete="off" />}
               </label>
             ))}
             <button className="btn btn-gold" type="submit">{t.go}</button>
           </form>
           {note && <p className="note" role="status">{note}</p>}
+          <datalist id="city-list">{Object.keys(CITIES).map(c => <option key={c} value={c} />)}</datalist>
         </div>
       </div>
 
       <div className="stats">
-        <div><b>12+</b><span>Destinations</span></div>
+        <div><b>4</b><span>Ways to book</span></div>
         <div><b>GST</b><span>Shown upfront</span></div>
         <div><b>Free</b><span>Online cancellation</span></div>
       </div>

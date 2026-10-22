@@ -4,8 +4,9 @@ import { useRouter } from 'next/navigation';
 import { TYPE_LABEL, type Destination } from '@/lib/destinations';
 import { inr } from '@/lib/pricing';
 import { useSite } from '@/components/SiteProvider';
+import CatalogAdmin from './CatalogAdmin';
 
-type Bk = { id: number; ref: string; trip: string | null; slug: string; travel_date: string; travellers: number; name: string; phone: string; email: string; total: number; status: string };
+type Bk = { id: number; ref: string; kind: string; trip: string | null; end_date: string | null; slug: string; travel_date: string; travellers: number; name: string; phone: string; email: string; total: number; status: string };
 type Stat = { status: string; n: number; amount: number };
 type Rv = { id: number; slug: string; rating: number; text: string; hidden: number; name: string };
 type Em = { id: number; to_addr: string; subject: string; body: string; status: string; error: string | null; created_at: number };
@@ -25,7 +26,7 @@ const blank: Form = { isNew: true, slug: '', name: '', state: '', type: 'heritag
 export default function AdminClient() {
   const { user, ready, openAuth } = useSite();
   const router = useRouter();
-  const [tab, setTab] = useState<'bookings' | 'destinations' | 'reviews' | 'emails'>('bookings');
+  const [tab, setTab] = useState<'bookings' | 'destinations' | 'hotel' | 'flight' | 'car' | 'reviews' | 'emails'>('bookings');
   const [bookings, setBookings] = useState<Bk[]>([]);
   const [stats, setStats] = useState<Stat[]>([]);
   const [filter, setFilter] = useState('all');
@@ -90,7 +91,7 @@ export default function AdminClient() {
         <div><b>{inr(stat('paid')?.amount ?? 0)}</b><span>Paid revenue (incl. GST)</span></div>
       </div>
       <div className="filters" role="tablist">
-        {(['bookings', 'destinations', 'reviews', 'emails'] as const).map(t => <button key={t} role="tab" aria-selected={tab === t} className={`chip${tab === t ? ' on' : ''}`} type="button" onClick={() => { setTab(t); setMsg(null); }}>{t[0].toUpperCase() + t.slice(1)}</button>)}
+        {([['bookings', 'Bookings'], ['destinations', 'Tours'], ['hotel', 'Hotels'], ['flight', 'Flights'], ['car', 'Cars'], ['reviews', 'Reviews'], ['emails', 'Emails']] as const).map(([t, label]) => <button key={t} role="tab" aria-selected={tab === t} className={`chip${tab === t ? ' on' : ''}`} type="button" onClick={() => { setTab(t); setMsg(null); }}>{label}</button>)}
       </div>
       {msg && <p className={`err dark${msg.ok ? ' okmsg' : ''}`} role="status">{msg.t}</p>}
 
@@ -98,7 +99,7 @@ export default function AdminClient() {
         <label className="f fil"><span>Show</span><select value={filter} onChange={e => setFilter(e.target.value)}><option value="all">All</option><option value="requested">Requested</option><option value="confirmed">Confirmed</option><option value="paid">Paid</option><option value="cancelled">Cancelled</option></select></label>
         <div className="tw"><table className="bt"><thead><tr><th>Ref</th><th>Trip</th><th>Date</th><th>People</th><th>Customer</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody>{shown.map(b => (
-            <tr key={b.id}><td>{b.ref}</td><td>{b.trip ?? b.slug}</td><td>{b.travel_date}</td><td>{b.travellers}</td>
+            <tr key={b.id}><td>{b.ref}</td><td>{b.trip ?? b.slug} <span className="tag2">{b.kind}</span></td><td>{b.travel_date}{b.end_date ? ` to ${b.end_date}` : ''}</td><td>{b.travellers}</td>
               <td>{b.name}<br /><span className="muted">{b.phone} · {b.email}</span></td><td>{inr(b.total)}</td>
               <td><span className={`st ${b.status}`}>{b.status}</span></td>
               <td className="acts">
@@ -145,6 +146,8 @@ export default function AdminClient() {
             <td><span className={`st ${e.status === 'sent' ? 'confirmed' : e.status === 'failed' ? 'cancelled' : ''}`}>{e.status}</span>{e.error && <div className="muted">{e.error}</div>}</td></tr>))}
             {!emails.length && <tr><td colSpan={4}>No emails yet.</td></tr>}</tbody></table></div>
       </>}
+
+      {(tab === 'hotel' || tab === 'flight' || tab === 'car') && <CatalogAdmin kind={tab} onMsg={setMsg} />}
 
       {tab === 'reviews' && (reviews.length === 0 ? <div className="empty"><p>No reviews yet.</p></div> : <ul className="rev admin">{reviews.map(r => (
         <li key={r.id}><div><span className="stars sm">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span> <b>{r.name}</b> on <i>{r.slug}</i> {r.hidden ? <span className="st cancelled">hidden</span> : null}</div><p>{r.text}</p>

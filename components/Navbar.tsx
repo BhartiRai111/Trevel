@@ -21,7 +21,10 @@ export default function Navbar() {
     <header className={`nav${scrolled || path !== '/' ? ' solid' : ''}`}>
       <Link className="logo" href="/">Roamora</Link>
       <nav className={`links${open ? ' open' : ''}`} onClick={() => setOpen(false)}>
-        <Link href="/search">Destinations</Link>
+        <Link href="/search">Tours</Link>
+        <Link href="/hotels">Hotels</Link>
+        <Link href="/flights">Flights</Link>
+        <Link href="/cars">Cars</Link>
         <Link href="/trips">My trips</Link>
         {user?.isAdmin && <Link href="/admin">Admin</Link>}
         {ready && (user
