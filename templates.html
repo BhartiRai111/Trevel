@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roamora | 10 hero templates</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#f5c542;--td:#073a37;--t:#0f8f86;--tl:#3cc5b8}
+*{box-sizing:border-box;margin:0}
+html{scroll-snap-type:y proximity;scroll-behavior:smooth}
+body{font-family:Poppins,system-ui,sans-serif;color:#fff;background:#052a28}
+.t{position:relative;min-height:100svh;overflow:hidden;display:flex;isolation:isolate;scroll-snap-align:start;padding:clamp(72px,9vw,110px) clamp(16px,5vw,64px) 40px}
+.bg{position:absolute;inset:0;z-index:-2;background:var(--td)}
+.bg i,.bg video{position:absolute;inset:0;width:100%;height:100%;background:var(--img) center/cover;object-fit:cover}
+.bg i{animation:var(--anim,zoom) 18s ease-in-out infinite alternate}
+.ov{position:absolute;inset:0;z-index:-1;background:var(--ov,linear-gradient(180deg,rgba(7,58,55,.6),rgba(15,143,134,.35) 50%,rgba(7,58,55,.92)))}
+@keyframes zoom{to{transform:scale(1.14)}}
+@keyframes pan{from{transform:scale(1.15) translateX(-3%)}to{transform:scale(1.15) translateX(3%)}}
+@keyframes rise{from{transform:scale(1.18) translateY(3%)}to{transform:scale(1.05) translateY(-2%)}}
+.label{position:absolute;top:18px;left:clamp(16px,5vw,64px);z-index:5;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);padding:5px 14px;border-radius:99px;font-size:13px;font-weight:600}
+.logo{font-weight:800;font-size:22px;letter-spacing:.5px}
+.nav{position:absolute;top:18px;right:clamp(16px,5vw,64px);z-index:4;display:flex;gap:22px;font-size:14px;align-items:center}
+.btn{border:0;border-radius:99px;padding:12px 26px;font:600 15px Poppins;background:var(--gold);color:#222;cursor:pointer}
+.btn.o{background:none;border:2px solid #fff;color:#fff}
+.eyebrow{letter-spacing:3px;text-transform:uppercase;font-size:12px;color:var(--gold);font-weight:600}
+h1{font-size:clamp(38px,7vw,88px);line-height:1.02;font-weight:800}
+p.l{max-width:480px;opacity:.92;margin:16px 0 24px}
+.s{display:flex;gap:8px;background:#fff;color:#0d2a28;border-radius:99px;padding:8px;max-width:620px;width:100%}
+.s input{flex:1;border:0;font:500 15px Poppins;padding:0 16px;min-width:0;background:none}
+.c{margin:auto;text-align:center;display:flex;flex-direction:column;align-items:center}
+.c .s{margin-top:24px}
+.glass{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(14px);border-radius:24px;padding:24px}
+.fld{display:grid;gap:10px;margin:14px 0}
+.fld input,.fld select{border:0;border-radius:12px;padding:13px 14px;font:500 15px Poppins;width:100%}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{border:1px solid rgba(255,255,255,.6);border-radius:99px;padding:7px 16px;font-size:14px;background:rgba(7,58,55,.35);cursor:pointer;color:#fff;font-family:Poppins}
+.chip.on{background:#fff;color:var(--td)}
+.stats{display:flex;gap:32px;flex-wrap:wrap}
+.stats b{display:block;font-size:30px}
+.stats span{font-size:13px;opacity:.85}
+/* per-template layout */
+.t1 .c{max-width:860px}
+.t2{align-items:center;gap:40px;flex-wrap:wrap;justify-content:space-between}
+.t2 .glass{width:min(100%,360px)}
+.t3{align-items:flex-end}
+.t3 h1{-webkit-text-stroke:2px #fff;color:transparent;font-size:clamp(54px,13vw,190px);letter-spacing:-2px}
+.t3 .wrap{width:100%}
+.t4{flex-direction:column;justify-content:flex-end;gap:28px}
+.t4 .bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;background:#fff;color:#0d2a28;border-radius:20px;padding:14px;max-width:900px}
+.t4 .bar label{font-size:12px;color:var(--t);font-weight:600;display:block;padding:0 8px}
+.t4 .bar input{border:0;width:100%;padding:0 8px;font:500 15px Poppins}
+.t5{flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:22px}
+.t5 .tabs{display:flex;gap:6px;justify-content:center}
+.t5 .tabs button{border:0;border-radius:12px;padding:9px 18px;font:600 14px Poppins;background:rgba(255,255,255,.15);color:#fff;cursor:pointer}
+.t5 .tabs .on{background:#fff;color:var(--td)}
+.t6{align-items:center}
+.t6::before{content:"";position:absolute;left:0;top:0;bottom:0;width:62%;background:linear-gradient(100deg,var(--td) 55%,rgba(15,143,134,.0));z-index:-1}
+.t6 .in{max-width:520px}
+.t7{flex-direction:column;justify-content:flex-end;gap:24px}
+.t7 .top{max-width:620px}
+.t7 .row{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px}
+.th{flex:0 0 150px;height:96px;border-radius:14px;background:var(--img) center/cover;border:3px solid transparent;cursor:pointer;color:#fff;display:flex;align-items:flex-end;padding:8px;font-size:12px;font-weight:600;position:relative;overflow:hidden}
+.th::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent,rgba(7,58,55,.85))}
+.th span{position:relative;z-index:1}
+.th.on{border-color:var(--gold)}
+.t8{align-items:center;justify-content:center;text-align:center;position:relative}
+.t8 h1{font-size:clamp(48px,15vw,220px);letter-spacing:.06em;font-weight:700}
+.t8 .corner{position:absolute;left:clamp(16px,5vw,64px);bottom:36px;max-width:300px;text-align:left;font-size:14px}
+.t8 .corner2{position:absolute;right:clamp(16px,5vw,64px);bottom:36px}
+.t9{align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:18px}
+.play{width:92px;height:92px;border-radius:50%;border:2px solid #fff;background:rgba(255,255,255,.18);backdrop-filter:blur(6px);color:#fff;font-size:34px;cursor:pointer;animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.55)}100%{box-shadow:0 0 0 34px rgba(255,255,255,0)}}
+.t9 .q{position:absolute;right:clamp(16px,5vw,64px);bottom:36px;max-width:300px;text-align:left;font-size:14px}
+.t10{align-items:center;gap:48px;flex-wrap:wrap;justify-content:center}
+.phone{width:min(100%,250px);aspect-ratio:9/18;border:7px solid #0b1f1e;border-radius:34px;background:var(--img) center/cover;position:relative;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.45)}
+.phone::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 30%,rgba(7,58,55,.95))}
+.phone div{position:absolute;z-index:1;left:16px;right:16px;bottom:18px}
+.phone h3{font-size:21px}
+.t10 .in{max-width:480px}
+.badges{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
+.badges span{border:1px solid #fff;border-radius:12px;padding:9px 16px;font-size:14px;font-weight:600}
+@media(max-width:760px){.nav{display:none}.t6::before{width:100%}}
+@media(prefers-reduced-motion:reduce){.bg i{animation:none}.play{animation:none}}
+</style>
+</head>
+<body>
+
+<!-- 1 Classic centered -->
+<section class="t t1" id="t1">
+  <div class="bg"><i style="--img:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=2000&q=80')"></i></div><div class="ov"></div>
+  <span class="label">Template 1 · Classic Centered · slow zoom</span>
+  <div class="nav"><span>Destinations</span><span>Deals</span><span>Stories</span><button class="btn">Login</button></div>
+  <div class="c"><span class="eyebrow">Explore · Discover · Roam</span><h1>Travel the world,<br>your way.</h1><p class="l">National parks, quiet beaches and mountain trails in one place.</p>
+  <div class="s"><input placeholder="Where do you want to go?" aria-label="Destination"><button class="btn">Search</button></div></div>
+</section>
+
+<!-- 2 Split with booking card -->
+<section class="t t2" id="t2" style="--anim:pan">
+  <div class="bg"><i style="--img:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80')"></i></div>
+  <div class="ov" style="--ov:linear-gradient(100deg,rgba(7,58,55,.9),rgba(15,143,134,.45) 60%,rgba(15,143,134,.2))"></div>
+  <span class="label">Template 2 · Booking Card · slow pan</span>
+  <div style="max-width:560px"><div class="logo" style="margin-bottom:28px">Roamora</div><span class="eyebrow">Island escapes</span><h1>Find your<br>perfect shore.</h1><p class="l">Handpicked beaches, local guides, free cancellation.</p></div>
+  <div class="glass"><b style="font-size:20px">Plan your trip</b><div class="fld"><input placeholder="Destination" aria-label="Destination"><input type="date" aria-label="Date"><select aria-label="Guests"><option>2 guests</option><option>4 guests</option></select></div><button class="btn" style="width:100%">Check availability</button></div>
+</section>
+
+<!-- 3 Outlined giant type -->
+<section class="t t3" id="t3" style="--anim:rise">
+  <div class="bg"><i style="--img:url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2000&q=80')"></i></div><div class="ov" style="--ov:linear-gradient(0deg,rgba(7,58,55,.9),rgba(15,143,134,.3))"></div>
+  <span class="label">Template 3 · Giant Outline Type · rise</span>
+  <div class="wrap"><span class="eyebrow">Adventure awaits</span><h1>WANDER<br>FAR.</h1><div class="chips" style="margin-top:16px"><span class="chip">Mountains</span><span class="chip">Beaches</span><span class="chip">Cities</span><span class="chip">Treks</span></div></div>
+</section>
+
+<!-- 4 Floating bottom search -->
+<section class="t t4" id="t4">
+  <div class="bg"><i style="--img:url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=2000&q=80')"></i></div><div class="ov"></div>
+  <span class="label">Template 4 · Bottom Search Bar · zoom</span>
+  <div><div class="logo" style="margin-bottom:26px">Roamora</div><h1>Quiet lakes.<br>Loud memories.</h1></div>
+  <div class="stats"><div><b>120+</b><span>Destinations</span></div><div><b>48K</b><span>Travellers</span></div><div><b>4.9★</b><span>Rating</span></div></div>
+  <div class="bar"><div><label>Where</label><input placeholder="Lake Como"></div><div><label>Check-in</label><input type="date"></div><div><label>Guests</label><input placeholder="2 people"></div><button class="btn">Search</button></div>
+</section>
+
+<!-- 5 Glass tabs -->
+<section class="t t5" id="t5" style="--anim:pan">
+  <div class="bg"><i style="--img:url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=2000&q=80')"></i></div><div class="ov" style="--ov:radial-gradient(circle at 50% 40%,rgba(15,143,134,.35),rgba(7,58,55,.92))"></div>
+  <span class="label">Template 5 · Glass Tabs · pan</span>
+  <h1 style="font-size:clamp(36px,6vw,72px)">Everything for your trip.</h1>
+  <div class="glass" style="width:min(100%,640px)"><div class="tabs" id="tabs"><button class="on">Tours</button><button>Hotels</button><button>Flights</button><button>Cars</button></div>
+  <div class="fld"><input id="tabIn" placeholder="Search tours in Bali" aria-label="Search"><button class="btn">Search tours</button></div></div>
+</section>
+
+<!-- 6 Diagonal panel -->
+<section class="t t6" id="t6" style="--anim:zoom">
+  <div class="bg"><i style="--img:url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=2000&q=80')"></i></div><div class="ov" style="--ov:linear-gradient(transparent,rgba(7,58,55,.3))"></div>
+  <span class="label">Template 6 · Teal Panel · zoom</span>
+  <div class="in"><div class="logo" style="margin-bottom:28px">Roamora</div><span class="eyebrow">Road trips</span><h1 style="font-size:clamp(36px,6vw,72px)">The road is<br>the destination.</h1><p class="l">Scenic routes with stays, fuel stops and the best viewpoints planned for you.</p><div style="display:flex;gap:12px;flex-wrap:wrap"><button class="btn">Plan a route</button><button class="btn o">Watch film</button></div></div>
+</section>
+
+<!-- 7 Destination slider -->
+<section class="t t7" id="t7">
+  <div class="bg" id="b7"><i id="i7" style="--img:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=2000&q=80')"></i></div><div class="ov"></div>
+  <span class="label">Template 7 · Destination Slider · click a card</span>
+  <div class="top"><span class="eyebrow" id="c7">Canada</span><h1 id="n7" style="font-size:clamp(38px,6vw,76px)">Starlit Peaks</h1><p class="l">Click a destination below and the whole background changes.</p><button class="btn">Explore</button></div>
+  <div class="row" id="r7"></div>
+</section>
+
+<!-- 8 Brand wordmark -->
+<section class="t t8" id="t8" style="--anim:rise">
+  <div class="bg"><i style="--img:url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=2000&q=80')"></i></div><div class="ov" style="--ov:linear-gradient(rgba(15,143,134,.55),rgba(7,58,55,.85))"></div>
+  <span class="label">Template 8 · Brand Wordmark · rise</span>
+  <h1>ROAMORA</h1>
+  <p class="corner">Curated trips to 120+ places. Small groups. Local guides.</p>
+  <div class="corner2"><button class="btn">Start exploring</button></div>
+</section>
+
+<!-- 9 Video play -->
+<section class="t t9" id="t9" style="--anim:pan">
+  <div class="bg"><i style="--img:url('https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=2000&q=80')"></i><video id="v9" muted loop playsinline preload="none" poster=""><source src="assets/hero.mp4" type="video/mp4"></video></div><div class="ov" style="--ov:linear-gradient(rgba(7,58,55,.7),rgba(15,143,134,.4),rgba(7,58,55,.85))"></div>
+  <span class="label">Template 9 · Video Hero · plays assets/hero.mp4</span>
+  <span class="eyebrow">Watch the journey</span><h1 style="font-size:clamp(36px,6vw,76px)">See it before<br>you go.</h1>
+  <button class="play" id="p9" aria-label="Play video">▶</button>
+  <div class="q glass" style="padding:14px 18px">“Booked in two minutes, best week of my year.”<br><b>Aisha K.</b></div>
+</section>
+
+<!-- 10 App promo -->
+<section class="t t10" id="t10" style="--anim:zoom">
+  <div class="bg"><i style="--img:url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=2000&q=80')"></i></div><div class="ov" style="--ov:linear-gradient(120deg,rgba(7,58,55,.92),rgba(15,143,134,.55))"></div>
+  <span class="label">Template 10 · App Promo · zoom</span>
+  <div class="in"><span class="eyebrow">Roamora app</span><h1 style="font-size:clamp(36px,6vw,72px)">Your trip in<br>your pocket.</h1><p class="l">Tickets, maps and your friends' plans offline.</p><div class="badges"><span>App Store</span><span>Google Play</span></div></div>
+  <div class="phone" style="--img:url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80')"><div><h3>Hill Track<br>National Park</h3><span style="color:var(--gold)">★★★★★</span><br><button class="btn" style="margin-top:10px;padding:8px 20px;font-size:13px">Book now</button></div></div>
+</section>
+
+<script>
+const $=s=>document.querySelector(s);
+/* 5 tabs */
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));
+ $('#tabIn').placeholder='Search '+b.textContent.toLowerCase()+' in Bali';});
+/* 7 slider */
+const D=[['Starlit Peaks','Canada','photo-1519681393784-d120267933ba'],['Swiss Alps','Switzerland','photo-1506905925346-21bda4d32df4'],['Sunset Shore','Maldives','photo-1507525428034-b723cf961d3e'],['Mirror Lake','Italy','photo-1501785888041-af3ef285b470'],['Bali Terraces','Indonesia','photo-1537996194471-e657df975ab4']];
+const img=id=>`https://images.unsplash.com/${id}?auto=format&fit=crop&w=`;
+$('#r7').innerHTML=D.map((d,i)=>`<div class="th${i?'':' on'}" data-i="${i}" tabindex="0" style="--img:url('${img(d[2])}300&q=70')"><span>${d[0]}</span></div>`).join('');
+$('#r7').addEventListener('click',e=>{const t=e.target.closest('.th');if(!t)return;const d=D[+t.dataset.i];
+ document.querySelectorAll('.th').forEach(x=>x.classList.toggle('on',x===t));
+ $('#n7').textContent=d[0];$('#c7').textContent=d[1];
+ const n=document.createElement('i');n.style.cssText=`--img:url('${img(d[2])}2000&q=80');opacity:0;transition:opacity 1s`;
+ $('#b7').appendChild(n);requestAnimationFrame(()=>n.style.opacity=1);
+ setTimeout(()=>{[...$('#b7').children].slice(0,-1).forEach(x=>x.remove())},1100)});
+/* 9 video (only if assets/hero.mp4 exists) */
+const v=$('#v9');v.style.opacity=0;
+$('#p9').addEventListener('click',()=>{v.style.opacity=1;v.play().catch(()=>{v.style.opacity=0})});
+</script>
+</body>
+</html>
