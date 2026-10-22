@@ -61,3 +61,18 @@ $('#showPw').addEventListener('click', () => { const p = $('#pw'); p.type = p.ty
 $('#loginForm').addEventListener('submit', e => { e.preventDefault(); show('#login', false); });
 $('#bookForm').addEventListener('submit', e => { e.preventDefault(); $('#bookOk').hidden = false; });
 $('#news').addEventListener('submit', e => { e.preventDefault(); $('#newsOk').hidden = false; });
+
+/* hero background: rotate photos; show video if assets/hero.mp4 exists */
+(() => {
+  const slides = [...document.querySelectorAll('.hero .slide')];
+  const v = $('#heroVideo');
+  let i = 0;
+  const timer = matchMedia('(prefers-reduced-motion: reduce)').matches ? null : setInterval(() => {
+    slides[i].classList.remove('on');
+    i = (i + 1) % slides.length;
+    slides[i].classList.add('on');
+  }, 6000);
+  v.addEventListener('canplay', () => { v.classList.add('ready'); if (timer) clearInterval(timer); });
+  v.addEventListener('error', () => v.remove(), true);
+  v.querySelector('source').addEventListener('error', () => v.remove());
+})();
