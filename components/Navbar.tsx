@@ -1,32 +1,38 @@
 'use client';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSite } from './SiteProvider';
 
 export default function Navbar() {
-  const { openLogin } = useSite();
-  const [solid, setSolid] = useState(false);
+  const { user, ready, openAuth, logout } = useSite();
+  const path = usePathname();
+  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setSolid(scrollY > 40);
+    const onScroll = () => setScrolled(scrollY > 40);
     onScroll();
     addEventListener('scroll', onScroll, { passive: true });
     return () => removeEventListener('scroll', onScroll);
   }, []);
 
   return (
-    <header className={`nav${solid ? ' solid' : ''}`}>
-      <a className="logo" href="#top">Roamora</a>
+    <header className={`nav${scrolled || path !== '/' ? ' solid' : ''}`}>
+      <Link className="logo" href="/">Roamora</Link>
       <nav className={`links${open ? ' open' : ''}`} onClick={() => setOpen(false)}>
-        <a href="#places">Destinations</a>
-        <a href="#featured">Featured</a>
-        <a href="#why">Why Roamora</a>
-        <a href="#stories">Stories</a>
+        <Link href="/search">Destinations</Link>
+        <Link href="/trips">My trips</Link>
+        {ready && (user
+          ? <button className="linkbtn mobile-only" type="button" onClick={logout}>Log out</button>
+          : <button className="linkbtn mobile-only" type="button" onClick={() => openAuth('login')}>Log in</button>)}
       </nav>
-      <button className="btn btn-light" type="button" onClick={openLogin}>Login</button>
-      <button className="burger" type="button" aria-label="Menu" aria-expanded={open} onClick={() => setOpen(o => !o)}>
-        <span /><span />
-      </button>
+      {ready && (user ? (
+        <div className="who"><span>Hi, {user.name.split(' ')[0]}</span><button className="btn btn-light" type="button" onClick={logout}>Log out</button></div>
+      ) : (
+        <button className="btn btn-light desk-only" type="button" onClick={() => openAuth('login')}>Log in</button>
+      ))}
+      <button className="burger" type="button" aria-label="Menu" aria-expanded={open} onClick={() => setOpen(o => !o)}><span /><span /></button>
     </header>
   );
 }
