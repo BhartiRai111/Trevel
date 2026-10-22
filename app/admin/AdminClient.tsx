@@ -1,18 +1,20 @@
 'use client';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { TYPE_LABEL, type Destination } from '@/lib/destinations';
+import { DEFAULT_PACKAGES, TYPE_LABEL, type Destination } from '@/lib/destinations';
 import { inr } from '@/lib/pricing';
 import { useSite } from '@/components/SiteProvider';
 import CatalogAdmin from './CatalogAdmin';
 
-type Bk = { id: number; ref: string; kind: string; trip: string | null; end_date: string | null; slug: string; travel_date: string; travellers: number; name: string; phone: string; email: string; total: number; status: string };
+type Bk = { id: number; ref: string; kind: string; package: string | null; notes: string | null; trip: string | null; end_date: string | null; slug: string; travel_date: string; travellers: number; name: string; phone: string; email: string; total: number; status: string };
 type Stat = { status: string; n: number; amount: number };
 type Rv = { id: number; slug: string; rating: number; text: string; hidden: number; name: string };
 type Em = { id: number; to_addr: string; subject: string; body: string; status: string; error: string | null; created_at: number };
-type Form = { isNew: boolean; slug: string; name: string; state: string; type: string; days: string; price: string; bestTime: string; tagline: string; about: string; img: string; active: boolean; highlights: string; itinerary: string };
+type Form = { isNew: boolean; slug: string; name: string; state: string; type: string; days: string; price: string; bestTime: string; tagline: string; about: string; img: string; active: boolean; highlights: string; itinerary: string; guide: string; reach: string; around: string; tips: string; packages: string };
 
-const toForm = (d: Destination): Form => ({ isNew: false, slug: d.slug, name: d.name, state: d.state, type: d.type, days: String(d.days), price: String(d.price), bestTime: d.bestTime, tagline: d.tagline, about: d.about, img: d.img, active: d.active, highlights: d.highlights.join('\n'), itinerary: d.itinerary.map(i => `${i.title} | ${i.text}`).join('\n') });
+const toForm = (d: Destination): Form => ({ isNew: false, slug: d.slug, name: d.name, state: d.state, type: d.type, days: String(d.days), price: String(d.price), bestTime: d.bestTime, tagline: d.tagline, about: d.about, img: d.img, active: d.active, highlights: d.highlights.join('\n'), itinerary: d.itinerary.map(i => `${i.title} | ${i.text}`).join('\n'),
+  guide: d.explore.items.map(i => [i.kind, i.type, i.name, i.text, i.img].join(' | ')).join('\n'), reach: d.explore.info.howToReach, around: d.explore.info.gettingAround, tips: d.explore.info.tips.join('\n'),
+  packages: d.packages.map(p => [p.name, p.mult, p.text, p.includes.join('; ')].join(' | ')).join('\n') });
 const waText = (b: Bk) => {
   const t = b.trip ?? b.slug, f = b.name.split(/\s+/)[0];
   const d = new Date(b.travel_date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -21,7 +23,7 @@ const waText = (b: Bk) => {
   return `Hi ${f}, this is Roamora about your booking request ${b.ref} for ${t} on ${d}.`;
 };
 const wa = (b: Bk) => `https://wa.me/91${b.phone}?text=${encodeURIComponent(waText(b))}`;
-const blank: Form = { isNew: true, slug: '', name: '', state: '', type: 'heritage', days: '3', price: '10000', bestTime: '', tagline: '', about: '', img: '', active: true, highlights: '', itinerary: '' };
+const blank: Form = { isNew: true, slug: '', name: '', state: '', type: 'heritage', days: '3', price: '10000', bestTime: '', tagline: '', about: '', img: '', active: true, highlights: '', itinerary: '', guide: '', reach: '', around: '', tips: '', packages: DEFAULT_PACKAGES.map(p => [p.name, p.mult, p.text, p.includes.join('; ')].join(' | ')).join('\n') };
 
 export default function AdminClient() {
   const { user, ready, openAuth } = useSite();
@@ -55,7 +57,15 @@ export default function AdminClient() {
     const body = {
       ...form, days: Number(form.days), price: Number(form.price),
       highlights: form.highlights.split('\n'),
-      itinerary: form.itinerary.split('\n').filter(l => l.trim()).map(l => { const [t, ...r] = l.split('|'); return { title: t, text: r.join('|') }; })
+      itinerary: form.itinerary.split('\n').filter(l => l.trim()).map(l => { const [t, ...r] = l.split('|'); return { title: t, text: r.join('|') }; }),
+      explore: {
+        items: form.guide.split('\n').filter(l => l.trim()).map(l => {
+          const p = l.split('|').map(x => x.trim()); const hasImg = p.length >= 5;
+          return { kind: p[0], type: p[1], name: p[2], text: p.slice(3, hasImg ? -1 : undefined).join(' | '), img: hasImg ? p[p.length - 1] : '' };
+        }),
+        info: { howToReach: form.reach, gettingAround: form.around, tips: form.tips.split('\n') }
+      },
+      packages: form.packages.split('\n').filter(l => l.trim()).map(l => { const [name, mult, text, inc] = l.split('|').map(x => x.trim()); return { name, mult: Number(mult), text, includes: (inc ?? '').split(';').map(x => x.trim()).filter(Boolean) }; })
     };
     const r = await fetch('/api/admin/destinations', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     if (!r.ok) { setMsg({ t: (await r.json()).error, ok: false }); return; }
@@ -100,7 +110,7 @@ export default function AdminClient() {
         <div className="tw"><table className="bt"><thead><tr><th>Ref</th><th>Trip</th><th>Date</th><th>People</th><th>Customer</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody>{shown.map(b => (
             <tr key={b.id}><td>{b.ref}</td><td>{b.trip ?? b.slug} <span className="tag2">{b.kind}</span></td><td>{b.travel_date}{b.end_date ? ` to ${b.end_date}` : ''}</td><td>{b.travellers}</td>
-              <td>{b.name}<br /><span className="muted">{b.phone} · {b.email}</span></td><td>{inr(b.total)}</td>
+              <td>{b.name}<br /><span className="muted">{b.phone} · {b.email}</span>{b.package && <><br /><span className="tag2">{b.package} package</span></>}{b.notes && <><br /><span className="muted">Note: {b.notes}</span></>}</td><td>{inr(b.total)}</td>
               <td><span className={`st ${b.status}`}>{b.status}</span></td>
               <td className="acts">
                 {b.status === 'requested' && <button className="linkbtn" type="button" onClick={() => act(b.id, 'confirm')}>Confirm</button>}
@@ -127,6 +137,15 @@ export default function AdminClient() {
           <label className="f"><span>Image (Unsplash photo id or https link)</span><input value={form.img} onChange={e => set('img', e.target.value)} required /></label>
           <label className="f"><span>Highlights (one per line)</span><textarea rows={4} value={form.highlights} onChange={e => set('highlights', e.target.value)} required /></label>
           <label className="f"><span>Day by day (one line per day: Title | Description)</span><textarea rows={6} value={form.itinerary} onChange={e => set('itinerary', e.target.value)} required /></label>
+          <h3 className="fh">Explore guide (shown on the destination page)</h3>
+          <label className="f"><span>Places, food and activities. One per line: kind | type | name | description | image (optional)</span><textarea rows={8} value={form.guide} onChange={e => set('guide', e.target.value)} placeholder={'see | Beach | Palolem Beach | A calm crescent bay… | photo-123\nfood | Local food | Fish curry | A tangy coconut curry…\ndo | Activity | River cruise | An evening boat ride…'} /></label>
+          <p className="muted small">kind is <b>see</b> (places), <b>food</b> or <b>do</b> (things to do). Leave the image empty to use the destination photo.</p>
+          <label className="f"><span>How to reach</span><textarea rows={2} value={form.reach} onChange={e => set('reach', e.target.value)} /></label>
+          <label className="f"><span>Getting around</span><textarea rows={2} value={form.around} onChange={e => set('around', e.target.value)} /></label>
+          <label className="f"><span>Good to know (one tip per line)</span><textarea rows={3} value={form.tips} onChange={e => set('tips', e.target.value)} /></label>
+          <h3 className="fh">Booking packages</h3>
+          <label className="f"><span>One per line: name | price multiplier | short description | included items separated by ;</span><textarea rows={5} value={form.packages} onChange={e => set('packages', e.target.value)} required /></label>
+          <p className="muted small">The first package is the base price (multiplier 1). Other prices are the destination price times the multiplier, so changing the price above updates every package.</p>
           <label className="cb"><input type="checkbox" checked={form.active} onChange={e => set('active', e.target.checked)} /> Visible on the website</label>
           <div className="row2"><button className="btn btn-dark inline" type="submit">Save</button><button className="linkbtn" type="button" onClick={() => setForm(null)}>Cancel</button></div>
         </form>

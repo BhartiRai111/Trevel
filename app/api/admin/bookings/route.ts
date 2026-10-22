@@ -9,7 +9,7 @@ const deny = () => NextResponse.json({ error: 'Admins only.' }, { status: 403 })
 export async function GET() {
   if (!(await requireAdmin())) return deny();
   const rows = await q(
-    `SELECT b.id, b.ref, b.kind, b.slug, COALESCE(b.title, d.name) AS trip, b.travel_date, b.end_date, b.travellers, b.units, b.name, b.phone, u.email, b.total, b.status, b.created_at
+    `SELECT b.id, b.ref, b.kind, b.slug, COALESCE(b.title, d.name) AS trip, b.travel_date, b.end_date, b.travellers, b.units, b.package, b.notes, b.name, b.phone, u.email, b.total, b.status, b.created_at
        FROM bookings b JOIN users u ON u.id = b.user_id LEFT JOIN destinations d ON d.slug = b.slug ORDER BY b.id DESC LIMIT 500`);
   const stats = await q('SELECT status, COUNT(*) AS n, COALESCE(SUM(total),0) AS amount FROM bookings GROUP BY status');
   return NextResponse.json({ bookings: rows, stats });

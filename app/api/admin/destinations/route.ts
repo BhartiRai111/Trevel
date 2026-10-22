@@ -15,6 +15,10 @@ export async function GET() {
 export async function PUT(req: Request) {
   if (!(await requireAdmin())) return deny();
   const b = await req.json().catch(() => ({}));
+  if (!b.isNew && typeof b.slug === 'string' && (b.explore === undefined || b.packages === undefined)) {
+    const cur = await getDestination(b.slug, false);
+    if (cur) { if (b.explore === undefined) b.explore = cur.explore; if (b.packages === undefined) b.packages = cur.packages; }
+  }
   const d = parseDestination(b);
   if (typeof d === 'string') return NextResponse.json({ error: d }, { status: 400 });
   const exists = !!(await getDestination(d.slug, false));

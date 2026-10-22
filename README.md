@@ -24,6 +24,13 @@ Needs Node 20.9 or newer.
 - **Cars with driver** (`/cars`): search by city, dates and type. Rate per day (driver, fuel and tolls for 250 km a day included) plus 5% GST.
 - Every booking is a request: `requested` → `confirmed` by you → `paid`. Prices are always recalculated on the server. All four kinds show up in My trips, in emails and in the admin booking list.
 
+**Destination guide and booking page**
+- Click any destination card (home page or Tours) to open its page: places to see, food and cafés, things to do, visitor information (best time, how to reach, getting around, tips), day-by-day plan and reviews. Each of the 12 destinations has its own content.
+- **Book This Trip** (in the page header, in the price card and in a bar at the bottom on phones) opens `/destinations/[slug]/book`: choose a Standard, Comfort or Premium package, dates, travellers, traveller details and special requests, with a live price breakdown (package price × travellers + 5% GST).
+- Submitting uses the same booking workflow as everything else: saved as a request, shown in My Trips and Admin (with the package and the note), confirmation email sent, then confirm → pay.
+- **Package prices** are the destination price times a multiplier (Standard ×1, Comfort ×1.4, Premium ×1.9 by default), so changing the destination price in Admin updates every package.
+- **Everything in the guide is sample information**, shown with a notice on each page. Edit it in Admin > Tours (one line per place: `kind | type | name | description | image`). Photos in the sample guide are placeholders by category; set a real photo per item in Admin. Use `see`, `food` or `do` as the kind.
+
 **Travellers**
 - Search and filter destinations; destination pages with highlights, a day-by-day plan, reviews and a live price breakdown (base + 5% GST + ₹0 fee = total).
 - Sign up / log in (email + password, Indian mobile number validated). Save places. Send booking requests.
@@ -59,7 +66,7 @@ Needs Node 20.9 or newer.
 
 ## Before going live
 - **Flights, hotels and cars are sample data.** The airlines (SkyIndia, Deccan Wings), flight numbers, hotels and car rates are made up so you can try the whole flow. Replace them in `/admin` with your real inventory. The site does not connect to airline or hotel systems, so seats and rooms are confirmed by your team after each request. Live fares and instant ticketing would need a partner API (for example Amadeus or a travel consolidator).
-- Sample prices, plans and photos are placeholders. Edit them in `/admin` (photos are Unsplash ids or any https image link).
+- Sample prices, plans, guide text (places, food, activities, visitor information) and photos are placeholders. The guide has no ratings and no restaurant prices or availability on purpose. Edit them in `/admin` (photos are Unsplash ids or any https image link).
 - Not built yet: SMS and automatic WhatsApp messages (WhatsApp Business API), trip reminder emails, automatic refunds, live airline and hotel inventory (partner APIs), reviews for hotels and cars.
 - Email sending was tested against a local test mail server, not against Gmail or another provider. Send yourself a test booking after you add your SMTP settings.
 - Back up your database (most providers do this daily; check yours). Use SSL in `DATABASE_URL` (`?sslmode=require`) for hosted databases.

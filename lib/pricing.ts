@@ -23,3 +23,6 @@ const DAY = 864e5;
 export const daysBetween = (from: string, to: string) => Math.round((new Date(to + 'T00:00:00Z').getTime() - new Date(from + 'T00:00:00Z').getTime()) / DAY);
 /** 0 = Sunday ... 6 = Saturday for a yyyy-mm-dd date. */
 export const weekday = (d: string) => new Date(d + 'T00:00:00Z').getUTCDay();
+
+/** Price per person of a package: the destination price times the package multiplier (rounded to ₹50). Standard (mult 1) is the destination price. */
+export const packagePrice = (basePrice: number, mult: number) => (mult === 1 ? basePrice : Math.round((basePrice * mult) / 50) * 50);

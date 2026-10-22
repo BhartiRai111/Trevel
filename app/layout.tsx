@@ -6,6 +6,7 @@ import AuthModal from '@/components/AuthModal';
 import VerifyBanner from '@/components/VerifyBanner';
 import { Footer } from '@/components/HomeSections';
 import { allDestinations } from '@/lib/repo';
+import { EMPTY_EXPLORE } from '@/lib/destinations';
 
 // destinations come from the database, so pages are rendered per request
 export const dynamic = 'force-dynamic';
@@ -17,7 +18,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#0f8f86' };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const dests = await allDestinations(true);
+  // cards need only the short fields; the guide, plan and packages are loaded by the destination pages
+  const dests = (await allDestinations(true)).map(d => ({ ...d, about: '', itinerary: [], explore: EMPTY_EXPLORE, packages: [] }));
   return (
     <html lang="en-IN">
       <head>

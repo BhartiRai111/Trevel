@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { SEED } from './destinations';
+import { SEED } from './seedDestinations';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type Row = Record<string, any>;
@@ -71,6 +71,10 @@ const SCHEMA = `
   ALTER TABLE bookings ADD COLUMN IF NOT EXISTS end_date TEXT;
   ALTER TABLE bookings ADD COLUMN IF NOT EXISTS units INTEGER NOT NULL DEFAULT 1;
   ALTER TABLE bookings ADD COLUMN IF NOT EXISTS title TEXT;
+  ALTER TABLE bookings ADD COLUMN IF NOT EXISTS package TEXT;
+  ALTER TABLE bookings ADD COLUMN IF NOT EXISTS notes TEXT;
+  ALTER TABLE destinations ADD COLUMN IF NOT EXISTS explore TEXT NOT NULL DEFAULT '';
+  ALTER TABLE destinations ADD COLUMN IF NOT EXISTS packages TEXT NOT NULL DEFAULT '';
   CREATE TABLE IF NOT EXISTS reviews (
     id SERIAL PRIMARY KEY, booking_id INTEGER NOT NULL UNIQUE REFERENCES bookings(id) ON DELETE CASCADE,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, slug TEXT NOT NULL, rating INTEGER NOT NULL,
@@ -124,11 +128,13 @@ async function init(): Promise<Backend> {
     await b.tx(async c => {
       for (const [i, x] of SEED.entries())
         await c.run(
-          'INSERT INTO destinations (slug,name,state,type,days,price,best_time,tagline,about,highlights,itinerary,img,active,sort) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,1,$13) ON CONFLICT (slug) DO NOTHING',
-          [x.slug, x.name, x.state, x.type, x.days, x.price, x.bestTime, x.tagline, x.about, JSON.stringify(x.highlights), JSON.stringify(x.itinerary), x.img, i]
+          'INSERT INTO destinations (slug,name,state,type,days,price,best_time,tagline,about,highlights,itinerary,img,active,sort,explore,packages) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,1,$13,$14,$15) ON CONFLICT (slug) DO NOTHING',
+          [x.slug, x.name, x.state, x.type, x.days, x.price, x.bestTime, x.tagline, x.about, JSON.stringify(x.highlights), JSON.stringify(x.itinerary), x.img, i, JSON.stringify(x.explore), JSON.stringify(x.packages)]
         );
     });
   }
+  // databases from before the guide pages: fill the sample guide and packages for rows that still have none (edited rows are never touched)
+  for (const x of SEED) await b.query("UPDATE destinations SET explore = $1, packages = $2 WHERE slug = $3 AND explore = ''", [JSON.stringify(x.explore), JSON.stringify(x.packages), x.slug]);
   const { seedCatalog } = await import('./catalog'); // loaded here to avoid a circular import
   await seedCatalog(wrap(b));
   return b;

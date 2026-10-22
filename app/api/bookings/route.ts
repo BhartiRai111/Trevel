@@ -4,7 +4,7 @@ import { one, q, run } from '@/lib/db';
 import { currentUser } from '@/lib/auth';
 import { getDestination } from '@/lib/repo';
 import { getItem, type Car, type Flight, type Hotel } from '@/lib/catalog';
-import { daysBetween, quote, quoteCar, quoteFlight, quoteHotel, weekday, type Quote } from '@/lib/pricing';
+import { daysBetween, packagePrice, quote, quoteCar, quoteFlight, quoteHotel, weekday, type Quote } from '@/lib/pricing';
 import { paymentsEnabled } from '@/lib/razorpay';
 import { hit, HOUR, tooMany } from '@/lib/ratelimit';
 import { notifyBooking } from '@/lib/emails';
@@ -54,11 +54,18 @@ export async function POST(req: Request) {
   if (!phone) return bad('Enter a valid 10-digit mobile number.');
 
   // every price is computed here on the server from the stored rate, never taken from the browser
-  let title = '', slugOut = slug, endDate: string | null = null, units = 1, qt: Quote;
+  let title = '', slugOut = slug, endDate: string | null = null, units = 1, qt: Quote, packageName: string | null = null;
   if (kind === 'tour') {
     const d = await getDestination(slug);
     if (!d) return bad('Unknown destination.');
-    title = d.name; slugOut = d.slug; qt = quote(d.price, travellers);
+    // package: optional (older clients book the base price); a named package must exist
+    let pkg = d.packages[0];
+    if (b.packageId !== undefined && b.packageId !== null && b.packageId !== '') {
+      pkg = d.packages.find(p => p.id === b.packageId) as typeof pkg;
+      if (!pkg) return bad('Choose one of the packages listed for this trip.');
+    }
+    packageName = b.packageId ? pkg.name : null;
+    title = b.packageId ? `${d.name} (${pkg.name})` : d.name; slugOut = d.slug; qt = quote(pkg ? packagePrice(d.price, pkg.mult) : d.price, travellers);
   } else if (kind === 'hotel') {
     const h = await getItem<Hotel>('hotel', slug);
     if (!h) return bad('Unknown hotel.');
@@ -85,10 +92,11 @@ export async function POST(req: Request) {
     title = c.name; slugOut = c.slug; endDate = back; qt = quoteCar(c.price, days);
   }
 
+  const notes = typeof b.notes === 'string' && b.notes.trim() ? b.notes.trim().slice(0, 300) : null;
   const ref = 'ROA-' + crypto.randomBytes(4).toString('hex').toUpperCase();
   const ins = await one<{ id: number }>(
-    'INSERT INTO bookings (ref, user_id, kind, slug, title, travel_date, end_date, travellers, units, name, phone, base, gst, total, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING id',
-    [ref, u.id, kind, slugOut, title, date, endDate, travellers, units, name, phone, qt.base, qt.gst, qt.total, Date.now()]);
+    'INSERT INTO bookings (ref, user_id, kind, slug, title, travel_date, end_date, travellers, units, name, phone, base, gst, total, created_at, package, notes) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING id',
+    [ref, u.id, kind, slugOut, title, date, endDate, travellers, units, name, phone, qt.base, qt.gst, qt.total, Date.now(), packageName, notes]);
   after(() => notifyBooking('requested', ins!.id));
   return NextResponse.json({ ref, total: qt.total, status: 'requested' });
 }

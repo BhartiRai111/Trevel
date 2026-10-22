@@ -316,3 +316,68 @@ footer p{font-size:14px;opacity:.8}
   .rcard{grid-template-columns:1fr}.rimg{min-height:150px}.rprice{align-items:flex-start;text-align:left}
   .frow{grid-template-columns:1fr 1fr;gap:10px}.fmid{grid-column:1/-1;order:3}.frow .rprice{grid-column:1/2}
 }
+
+/* ---------- destination guide, Book This Trip, booking page ---------- */
+.bigbtn{padding:14px 32px;font-size:17px}
+.hero-act{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.xnav{display:flex;gap:8px;flex-wrap:wrap;margin:28px 0 4px;position:sticky;top:64px;z-index:5;background:var(--bg);padding:10px 0}
+.xnav a{border:2px solid var(--teal);border-radius:99px;padding:6px 16px;font-size:14px;font-weight:600;color:var(--teal);text-decoration:none}
+.xnav a:hover,.xnav a:focus-visible{background:var(--teal);color:#fff}
+.xsec{scroll-margin-top:130px}
+.xgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:16px;margin-top:14px}
+.xcard{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(15,143,134,.1);display:flex;flex-direction:column}
+.xph{aspect-ratio:4/3;background-size:cover;background-position:center}
+.xbody{padding:14px 16px 16px;display:grid;gap:6px;align-content:start}
+.xbody h3{font-size:17px;margin:0}
+.xbody p{font-size:14px;color:var(--muted);max-width:none}
+.infogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px;margin-top:14px}
+.infogrid>div{background:#fff;border-radius:16px;padding:16px 18px}
+.infogrid h3{font-size:15px;color:var(--teal-d);margin:0 0 6px}
+.infogrid p{font-size:14px;max-width:none}
+.sample{background:#fff8e1;color:#6b5200;border-radius:12px;padding:10px 14px;font-size:13px;margin-top:20px;max-width:none}
+.panel .bigbtn{text-align:center}
+.ctabar{display:none}
+.crumbs{font-size:14px;color:var(--muted);margin-bottom:8px}
+.crumbs a{color:var(--teal-d)}
+.bookgrid{display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start}
+.bcol{display:grid;gap:18px}
+.bstep{border:0;background:#fff;border-radius:20px;padding:20px;display:grid;gap:14px;margin:0;min-width:0}
+.bstep legend{float:left;width:100%;font-size:18px;font-weight:700;display:flex;gap:10px;align-items:center;padding:0;margin-bottom:12px}
+.bstep legend+*{clear:both}
+.bstep .n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--teal);color:#fff;font-size:15px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pkgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px}
+.pkg{border:2px solid #cfe5e2;border-radius:16px;padding:14px;display:grid;gap:6px;align-content:start;cursor:pointer;position:relative;background:#fff}
+.pkg input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.pkg.on{border-color:var(--teal);background:#f1fbfa;box-shadow:0 0 0 3px rgba(15,143,134,.18)}
+.pkg:focus-within{outline:3px solid var(--gold);outline-offset:2px}
+.pk-h{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.pk-p{font-weight:700;color:var(--teal-d)}
+.pk-p small{font-weight:400;color:var(--muted);font-size:12px}
+.tick.sm{font-size:13px;gap:4px;margin-top:4px}
+.bsum{top:84px;overflow:hidden;padding:0}
+.bsum>*:not(.bs-top){margin-inline:22px}
+.bsum>*:last-child{margin-bottom:22px}
+.bs-top{height:130px;background-size:cover;background-position:center;display:flex;align-items:flex-end;margin:0!important}
+.bs-top span{display:block;width:100%;padding:30px 22px 12px;color:#fff;background:linear-gradient(transparent,rgba(7,58,55,.9));font-size:14px}
+.bsum h2{font-size:19px;margin:0}
+.done{background:#fff;border-radius:22px;padding:28px;max-width:720px;display:grid;gap:12px}
+.done h2{color:var(--teal-d);margin:0}
+.steps2{display:grid;gap:6px;padding-left:20px;font-size:15px}
+.fh{font-size:17px;margin:14px 0 0;color:var(--teal-d)}
+@media(max-width:900px){
+  .bookgrid{grid-template-columns:1fr}.bsum{position:static}
+  .xnav{top:60px}
+  .ctabar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fff;box-shadow:0 -6px 24px rgba(7,58,55,.2);padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));justify-content:space-between;align-items:center;gap:12px}
+  .ctabar b{font-size:20px;color:var(--teal-d)}
+  .detail .panel{display:none}
+  body:has(.ctabar){padding-bottom:70px}
+  body:has(.ctabar) .vbar{bottom:80px}
+}
+@media(max-width:560px){.two{grid-template-columns:1fr}.hero-act .btn{width:100%;text-align:center}}
+
+/* ---------- polish: form fonts and summary button ---------- */
+.bsum>.btn{display:block;width:auto;text-align:center}
+.f textarea,.bstep textarea{border:2px solid #cfe5e2;border-radius:12px;padding:10px 12px;width:100%;color:var(--ink);background:#fff;resize:vertical}
+/* keep a sans-serif fallback on every control if Poppins has not loaded */
+input,select,textarea,button,.f input,.f select,.f textarea,.search input,.search select,.field input,.news input,.linkbox,.rform textarea,.aform textarea,.bar2 select,.step output{font-family:Poppins,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
