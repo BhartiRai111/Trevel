@@ -61,6 +61,8 @@ export function db(): DatabaseSync {
       id INTEGER PRIMARY KEY AUTOINCREMENT, to_addr TEXT NOT NULL, subject TEXT NOT NULL, body TEXT NOT NULL,
       status TEXT NOT NULL, error TEXT, created_at INTEGER NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS rate_hits (key TEXT NOT NULL, ts INTEGER NOT NULL);
+    CREATE INDEX IF NOT EXISTS idx_rate_hits ON rate_hits(key, ts);
     CREATE TABLE IF NOT EXISTS reviews (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       booking_id INTEGER NOT NULL UNIQUE REFERENCES bookings(id) ON DELETE CASCADE,

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { currentUser } from '@/lib/auth';
+import { hit, HOUR, tooMany } from '@/lib/ratelimit';
 import { createOrder, paymentsEnabled, publicKeyId } from '@/lib/razorpay';
 
 export const dynamic = 'force-dynamic';
@@ -9,6 +10,8 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   const u = await currentUser(); if (!u) return NextResponse.json({ error: 'Please log in.' }, { status: 401 });
   if (!paymentsEnabled()) return NextResponse.json({ error: 'Online payment is not set up yet. Our team will share payment details with you.' }, { status: 503 });
+  const wait = hit(`payorder:${u.id}`, 20, HOUR);
+  if (wait) return tooMany(wait);
   const { bookingId } = await req.json().catch(() => ({}));
   const b = db().prepare('SELECT id, ref, total, status, name, phone FROM bookings WHERE id = ? AND user_id = ?').get(Number(bookingId), u.id) as unknown as
     { id: number; ref: string; total: number; status: string; name: string; phone: string } | undefined;

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { currentUser } from '@/lib/auth';
+import { hit, HOUR, tooMany } from '@/lib/ratelimit';
 import { reviewsFor } from '@/lib/repo';
 
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,8 @@ export async function GET(req: Request) {
 /** Only the traveller of a paid/confirmed booking whose trip date has passed can review it, once. */
 export async function POST(req: Request) {
   const u = await currentUser(); if (!u) return NextResponse.json({ error: 'Please log in.' }, { status: 401 });
+  const wait = hit(`review:${u.id}`, 10, HOUR);
+  if (wait) return tooMany(wait);
   const b = await req.json().catch(() => ({}));
   const rating = Number(b.rating), text = typeof b.text === 'string' ? b.text.trim() : '';
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) return NextResponse.json({ error: 'Choose a rating from 1 to 5 stars.' }, { status: 400 });

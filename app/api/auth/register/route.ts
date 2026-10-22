@@ -1,12 +1,15 @@
 import { after, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { hashPassword, isAdminEmail, startSession } from '@/lib/auth';
+import { clientIp, hit, HOUR, tooMany } from '@/lib/ratelimit';
 import { createToken } from '@/lib/tokens';
 import { sendVerifyEmail } from '@/lib/emails';
 import { siteUrl } from '@/lib/env';
 import { cleanName, cleanPhone, isEmail } from '@/lib/validate';
 
 export async function POST(req: Request) {
+  const wait = hit(`register:${clientIp(req)}`, 10, HOUR);
+  if (wait) return tooMany(wait);
   const b = await req.json().catch(() => ({}));
   const name = cleanName(b.name), phone = cleanPhone(b.phone);
   const email = isEmail(b.email) ? b.email.toLowerCase() : null;

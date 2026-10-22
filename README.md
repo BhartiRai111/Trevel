@@ -24,6 +24,12 @@ Needs Node 22.13 or newer (uses Node's built-in SQLite, no database to install).
 - Email verification: new accounts get a link. When email is set up, an admin account must also be verified.
 - Admin screen has an **Emails** tab (what was sent, and any errors) and a **WhatsApp** button on each booking that opens a ready message to the customer (no WhatsApp API needed).
 
+**Protection against abuse**
+- Login: 5 wrong passwords per email from one IP, 30 per IP, and 25 per email across all IPs, each within 15 minutes, then "try again later" (HTTP 429). The real owner on a different IP is not locked out by one attacker. A large attack spread over many IPs against one email can still lock that account for up to 15 minutes; that is the trade-off for stopping password guessing.
+- Per hour: 10 sign-ups per IP, 5 forgot-password requests per IP, 10 reset and 20 verify tries per IP, 10 booking requests and 10 reviews per user, 20 payment starts per user.
+- Security headers on every page (no framing, no content sniffing, HTTPS only, restricted browser features).
+- The IP comes from `X-Forwarded-For`, so host the site behind a proxy that sets it (Nginx, Cloudflare, Vercel). Without one, an attacker can fake the IP header; the per-email limits still apply.
+
 **Admin (`/admin`)**
 - Bookings: confirm requests, mark offline payments as paid, cancel. Counts and paid revenue at the top.
 - Destinations: add, edit, hide. Price, days, text, image, highlights and the day-by-day plan. Existing bookings keep the price they were made at.
@@ -40,7 +46,7 @@ Needs Node 22.13 or newer (uses Node's built-in SQLite, no database to install).
 
 ## Before going live
 - Sample prices, plans and photos are placeholders. Edit them in `/admin` (photos are Unsplash ids or any https image link).
-- Not built yet: SMS and automatic WhatsApp messages (WhatsApp Business API), trip reminder emails, login rate limiting, automatic refunds, Hotels / Flights / Cars search.
+- Not built yet: SMS and automatic WhatsApp messages (WhatsApp Business API), trip reminder emails, automatic refunds, Hotels / Flights / Cars search.
 - Email sending was tested against a local test mail server, not against Gmail or another provider. Send yourself a test booking after you add your SMTP settings.
 - SQLite is fine for one server. On Vercel-style hosting use a hosted database instead.
 - Razorpay calls could not be tested against the live API from the build environment. The payment signature check, webhook and booking status changes were tested; do a test-mode payment before going live.

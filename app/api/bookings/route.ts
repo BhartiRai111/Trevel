@@ -6,6 +6,7 @@ import { getDestination } from '@/lib/repo';
 import { quote } from '@/lib/pricing';
 import { paymentsEnabled } from '@/lib/razorpay';
 import { cleanName, cleanPhone } from '@/lib/validate';
+import { hit, HOUR, tooMany } from '@/lib/ratelimit';
 import { notifyBooking } from '@/lib/emails';
 
 export const dynamic = 'force-dynamic';
@@ -32,6 +33,8 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const u = await currentUser(); if (!u) return unauth();
+  const wait = hit(`booking:${u.id}`, 10, HOUR);
+  if (wait) return tooMany(wait);
   const b = await req.json().catch(() => ({}));
   const d = typeof b.slug === 'string' ? getDestination(b.slug) : undefined;
   if (!d) return NextResponse.json({ error: 'Unknown destination.' }, { status: 400 });
