@@ -16,7 +16,8 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#0f8f86' };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const dests = await allDestinations(true);
   return (
     <html lang="en-IN">
       <head>
@@ -26,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
       <body>
-        <SiteProvider dests={allDestinations(true)}>
+        <SiteProvider dests={dests}>
           <Navbar />
           {children}
           <Footer />

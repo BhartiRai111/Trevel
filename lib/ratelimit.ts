@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db } from './db';
+import { q, run } from './db';
 
 /**
  * Small database-backed rate limiter (works across restarts, one server).
@@ -11,25 +11,25 @@ export function clientIp(req: Request) {
 }
 
 /** Seconds to wait if `key` already has `max` or more hits in the window, else 0. Does not record a hit. */
-export function waitFor(key: string, max: number, windowMs: number): number {
+export async function waitFor(key: string, max: number, windowMs: number): Promise<number> {
   const since = Date.now() - windowMs;
-  const rows = db().prepare('SELECT ts FROM rate_hits WHERE key = ? AND ts > ? ORDER BY ts ASC').all(key, since) as unknown as { ts: number }[];
+  const rows = await q<{ ts: number }>('SELECT ts FROM rate_hits WHERE key = $1 AND ts > $2 ORDER BY ts ASC', [key, since]);
   if (rows.length < max) return 0;
   return Math.max(1, Math.ceil((rows[rows.length - max].ts + windowMs - Date.now()) / 1000));
 }
 
-export function record(key: string) {
-  db().prepare('INSERT INTO rate_hits (key, ts) VALUES (?, ?)').run(key, Date.now());
-  if (Math.random() < 0.01) db().prepare('DELETE FROM rate_hits WHERE ts < ?').run(Date.now() - 864e5);
+export async function record(key: string) {
+  await run('INSERT INTO rate_hits (key, ts) VALUES ($1, $2)', [key, Date.now()]);
+  if (Math.random() < 0.01) await run('DELETE FROM rate_hits WHERE ts < $1', [Date.now() - 864e5]);
 }
 
-export function clear(key: string) { db().prepare('DELETE FROM rate_hits WHERE key = ?').run(key); }
+export async function clear(key: string) { await run('DELETE FROM rate_hits WHERE key = $1', [key]); }
 
 /** Counts one hit and reports how long to wait if the limit is passed (0 = allowed). */
-export function hit(key: string, max: number, windowMs: number): number {
-  const w = waitFor(key, max, windowMs);
+export async function hit(key: string, max: number, windowMs: number): Promise<number> {
+  const w = await waitFor(key, max, windowMs);
   if (w) return w;
-  record(key);
+  await record(key);
   return 0;
 }
 

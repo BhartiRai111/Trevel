@@ -3,8 +3,8 @@ import { img } from '@/lib/destinations';
 import { allDestinations, getDestination } from '@/lib/repo';
 import { inr } from '@/lib/pricing';
 
-export function Featured() {
-  const d = getDestination('ladakh-leh') ?? allDestinations(true)[0];
+export async function Featured() {
+  const d = (await getDestination('ladakh-leh')) ?? (await allDestinations(true))[0];
   if (!d) return null;
   return (
     <section className="featured photo" id="featured" style={{ ['--img' as string]: `url('${img(d.img, 2000, 80)}')` }}>

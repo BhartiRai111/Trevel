@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { db } from '@/lib/db';
+import { one } from '@/lib/db';
 import { getDestination } from '@/lib/repo';
 import { img } from '@/lib/destinations';
 
@@ -13,8 +13,8 @@ type Row = { slug: string; travel_date: string; travellers: number; name: string
 /** Public, read-only trip page. Shows no phone, email or price. */
 export default async function SharedTrip({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
-  const b = db().prepare("SELECT slug, travel_date, travellers, name, status FROM bookings WHERE share_token = ? AND status != 'cancelled'").get(token) as unknown as Row | undefined;
-  const d = b && getDestination(b.slug, false);
+  const b = await one<Row>("SELECT slug, travel_date, travellers, name, status FROM bookings WHERE share_token = $1 AND status != 'cancelled'", [token.slice(0, 64)]);
+  const d = b && (await getDestination(b.slug, false));
   if (!b || !d) notFound();
   const first = b.name.split(/\s+/)[0];
   const date = new Date(b.travel_date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });

@@ -9,16 +9,16 @@ export const dynamic = 'force-dynamic';
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const d = getDestination((await params).slug);
+  const d = await getDestination((await params).slug);
   return d ? { title: d.name, description: d.tagline } : {};
 }
 
 const Stars = ({ n }: { n: number }) => <span className="stars sm" aria-label={`${n.toFixed(1)} out of 5`}>{'★'.repeat(Math.round(n))}{'☆'.repeat(5 - Math.round(n))}</span>;
 
 export default async function DestinationPage({ params }: Props) {
-  const d = getDestination((await params).slug);
+  const d = await getDestination((await params).slug);
   if (!d) notFound();
-  const rv = reviewsFor(d.slug);
+  const rv = await reviewsFor(d.slug);
   return (
     <main>
       <section className="dhero photo" style={{ ['--img' as string]: `url('${img(d.img, 2000, 80)}')` }}>

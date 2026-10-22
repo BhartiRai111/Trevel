@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     const ev = JSON.parse(raw);
     if (ev.event === 'payment.captured') {
       const pay = ev.payload?.payment?.entity;
-      if (pay?.order_id && pay?.id) markPaid(String(pay.order_id), String(pay.id));
+      if (pay?.order_id && pay?.id) await markPaid(String(pay.order_id), String(pay.id));
     }
   } catch { /* ignore malformed body */ }
   return NextResponse.json({ ok: true });

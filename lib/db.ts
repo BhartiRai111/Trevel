@@ -1,87 +1,126 @@
-import type { DatabaseSync } from 'node:sqlite';
 import fs from 'node:fs';
 import path from 'node:path';
 import { SEED } from './destinations';
 
-const g = globalThis as unknown as { __roamoraDb?: DatabaseSync };
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export type Row = Record<string, any>;
+type Raw = { query: (sql: string, params?: unknown[]) => Promise<{ rows: Row[]; count: number }> };
+export type Conn = {
+  /** all rows */ q: <T = Row>(sql: string, params?: unknown[]) => Promise<T[]>;
+  /** first row or undefined */ one: <T = Row>(sql: string, params?: unknown[]) => Promise<T | undefined>;
+  /** number of rows changed */ run: (sql: string, params?: unknown[]) => Promise<number>;
+};
+type Backend = Raw & { exec: (sql: string) => Promise<void>; tx: <T>(fn: (c: Conn) => Promise<T>) => Promise<T> };
 
-function addCol(d: DatabaseSync, table: string, col: string, def: string) {
-  const cols = d.prepare(`PRAGMA table_info(${table})`).all() as unknown as { name: string }[];
-  if (!cols.some(c => c.name === col)) d.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`);
+const wrap = (r: Raw): Conn => ({
+  q: async (sql, p) => (await r.query(sql, p)).rows as any,
+  one: async (sql, p) => (await r.query(sql, p)).rows[0] as any,
+  run: async (sql, p) => (await r.query(sql, p)).count
+});
+
+const SCHEMA = `
+  CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, phone TEXT NOT NULL,
+    password_hash TEXT NOT NULL, created_at BIGINT NOT NULL, email_verified INTEGER NOT NULL DEFAULT 0
+  );
+  CREATE TABLE IF NOT EXISTS sessions (
+    token_hash TEXT PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, expires_at BIGINT NOT NULL
+  );
+  CREATE TABLE IF NOT EXISTS saved (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, slug TEXT NOT NULL, PRIMARY KEY (user_id, slug)
+  );
+  CREATE TABLE IF NOT EXISTS bookings (
+    id SERIAL PRIMARY KEY, ref TEXT NOT NULL UNIQUE, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    slug TEXT NOT NULL, travel_date TEXT NOT NULL, travellers INTEGER NOT NULL, name TEXT NOT NULL, phone TEXT NOT NULL,
+    base INTEGER NOT NULL, gst INTEGER NOT NULL, total INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'requested',
+    created_at BIGINT NOT NULL, share_token TEXT, paid_at BIGINT
+  );
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_bookings_share ON bookings(share_token) WHERE share_token IS NOT NULL;
+  CREATE INDEX IF NOT EXISTS idx_bookings_user ON bookings(user_id);
+  CREATE TABLE IF NOT EXISTS destinations (
+    slug TEXT PRIMARY KEY, name TEXT NOT NULL, state TEXT NOT NULL, type TEXT NOT NULL, days INTEGER NOT NULL,
+    price INTEGER NOT NULL, best_time TEXT NOT NULL, tagline TEXT NOT NULL, about TEXT NOT NULL, highlights TEXT NOT NULL,
+    itinerary TEXT NOT NULL, img TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, sort INTEGER NOT NULL DEFAULT 0
+  );
+  CREATE TABLE IF NOT EXISTS payments (
+    id SERIAL PRIMARY KEY, booking_id INTEGER NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+    order_id TEXT NOT NULL UNIQUE, payment_id TEXT, amount INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'created', created_at BIGINT NOT NULL
+  );
+  CREATE TABLE IF NOT EXISTS email_tokens (
+    token_hash TEXT PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    purpose TEXT NOT NULL, expires_at BIGINT NOT NULL, created_at BIGINT NOT NULL
+  );
+  CREATE TABLE IF NOT EXISTS outbox (
+    id SERIAL PRIMARY KEY, to_addr TEXT NOT NULL, subject TEXT NOT NULL, body TEXT NOT NULL, status TEXT NOT NULL, error TEXT, created_at BIGINT NOT NULL
+  );
+  CREATE TABLE IF NOT EXISTS rate_hits (key TEXT NOT NULL, ts BIGINT NOT NULL);
+  CREATE INDEX IF NOT EXISTS idx_rate_hits ON rate_hits(key, ts);
+  CREATE TABLE IF NOT EXISTS reviews (
+    id SERIAL PRIMARY KEY, booking_id INTEGER NOT NULL UNIQUE REFERENCES bookings(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, slug TEXT NOT NULL, rating INTEGER NOT NULL,
+    text TEXT NOT NULL, hidden INTEGER NOT NULL DEFAULT 0, created_at BIGINT NOT NULL
+  );
+`;
+
+async function connectPg(url: string): Promise<Backend> {
+  const pg = (await import('pg')).default;
+  pg.types.setTypeParser(20, v => Number(v)); // BIGINT (timestamps in ms, COUNT, SUM) as numbers
+  const pool = new pg.Pool({ connectionString: url, max: Number(process.env.PG_POOL_MAX || 10) });
+  const asRaw = (c: { query: (s: string, p?: unknown[]) => Promise<{ rows: Row[]; rowCount: number | null }> }): Raw => ({
+    query: async (sql, params) => { const r = await c.query(sql, params as unknown[]); return { rows: r.rows, count: r.rowCount ?? 0 }; }
+  });
+  return {
+    ...asRaw(pool),
+    exec: async sql => { await pool.query(sql); },
+    tx: async fn => {
+      const client = await pool.connect();
+      try { await client.query('BEGIN'); const out = await fn(wrap(asRaw(client))); await client.query('COMMIT'); return out; }
+      catch (e) { await client.query('ROLLBACK').catch(() => {}); throw e; }
+      finally { client.release(); }
+    }
+  };
 }
 
-/** SQLite file at ./data/roamora.db (Node's built-in sqlite, no extra package). */
-export function db(): DatabaseSync {
-  if (g.__roamoraDb) return g.__roamoraDb;
-  const dir = process.env.DATA_DIR || path.join(process.cwd(), 'data');
+/** Local development without installing anything: a real Postgres running inside Node, saved in ./data/pglite */
+async function connectEmbedded(): Promise<Backend> {
+  const { PGlite } = await import('@electric-sql/pglite');
+  const dir = path.join(process.env.DATA_DIR || path.join(process.cwd(), 'data'), 'pglite');
   fs.mkdirSync(dir, { recursive: true });
-  const { DatabaseSync: DB } = process.getBuiltinModule('node:sqlite');
-  const d = new DB(path.join(dir, 'roamora.db'));
-  d.exec(`
-    PRAGMA journal_mode = WAL;
-    PRAGMA foreign_keys = ON;
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, phone TEXT NOT NULL,
-      password_hash TEXT NOT NULL, created_at INTEGER NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS sessions (
-      token_hash TEXT PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      expires_at INTEGER NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS saved (
-      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, slug TEXT NOT NULL,
-      PRIMARY KEY (user_id, slug)
-    );
-    CREATE TABLE IF NOT EXISTS bookings (
-      id INTEGER PRIMARY KEY AUTOINCREMENT, ref TEXT NOT NULL UNIQUE,
-      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      slug TEXT NOT NULL, travel_date TEXT NOT NULL, travellers INTEGER NOT NULL,
-      name TEXT NOT NULL, phone TEXT NOT NULL,
-      base INTEGER NOT NULL, gst INTEGER NOT NULL, total INTEGER NOT NULL,
-      status TEXT NOT NULL DEFAULT 'requested', created_at INTEGER NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS destinations (
-      slug TEXT PRIMARY KEY, name TEXT NOT NULL, state TEXT NOT NULL, type TEXT NOT NULL,
-      days INTEGER NOT NULL, price INTEGER NOT NULL, best_time TEXT NOT NULL, tagline TEXT NOT NULL,
-      about TEXT NOT NULL, highlights TEXT NOT NULL, itinerary TEXT NOT NULL, img TEXT NOT NULL,
-      active INTEGER NOT NULL DEFAULT 1, sort INTEGER NOT NULL DEFAULT 0
-    );
-    CREATE TABLE IF NOT EXISTS payments (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      booking_id INTEGER NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
-      order_id TEXT NOT NULL UNIQUE, payment_id TEXT, amount INTEGER NOT NULL,
-      status TEXT NOT NULL DEFAULT 'created', created_at INTEGER NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS email_tokens (
-      token_hash TEXT PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      purpose TEXT NOT NULL, expires_at INTEGER NOT NULL, created_at INTEGER NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS outbox (
-      id INTEGER PRIMARY KEY AUTOINCREMENT, to_addr TEXT NOT NULL, subject TEXT NOT NULL, body TEXT NOT NULL,
-      status TEXT NOT NULL, error TEXT, created_at INTEGER NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS rate_hits (key TEXT NOT NULL, ts INTEGER NOT NULL);
-    CREATE INDEX IF NOT EXISTS idx_rate_hits ON rate_hits(key, ts);
-    CREATE TABLE IF NOT EXISTS reviews (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      booking_id INTEGER NOT NULL UNIQUE REFERENCES bookings(id) ON DELETE CASCADE,
-      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      slug TEXT NOT NULL, rating INTEGER NOT NULL, text TEXT NOT NULL,
-      hidden INTEGER NOT NULL DEFAULT 0, created_at INTEGER NOT NULL
-    );
-  `);
-  addCol(d, 'bookings', 'share_token', 'TEXT');
-  addCol(d, 'bookings', 'paid_at', 'INTEGER');
-  addCol(d, 'users', 'email_verified', 'INTEGER NOT NULL DEFAULT 0');
-  d.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_bookings_share ON bookings(share_token) WHERE share_token IS NOT NULL');
-
-  const n = (d.prepare('SELECT COUNT(*) AS n FROM destinations').get() as unknown as { n: number }).n;
-  if (n === 0) {
-    const ins = d.prepare('INSERT INTO destinations (slug,name,state,type,days,price,best_time,tagline,about,highlights,itinerary,img,active,sort) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
-    SEED.forEach((x, i) => ins.run(x.slug, x.name, x.state, x.type, x.days, x.price, x.bestTime, x.tagline, x.about,
-      JSON.stringify(x.highlights), JSON.stringify(x.itinerary), x.img, 1, i));
-  }
-  g.__roamoraDb = d;
-  return d;
+  const lite = new PGlite(dir, { parsers: { 20: (v: string) => Number(v) } });
+  await lite.waitReady;
+  type Q = { query: (s: string, p?: unknown[]) => Promise<{ rows: Row[]; affectedRows?: number }> };
+  const asRaw = (c: Q): Raw => ({ query: async (sql, params) => { const r = await c.query(sql, params as unknown[]); return { rows: r.rows, count: r.affectedRows ?? 0 }; } });
+  return {
+    ...asRaw(lite as unknown as Q),
+    exec: async sql => { await lite.exec(sql); },
+    tx: fn => lite.transaction(t => fn(wrap(asRaw(t as unknown as Q))))
+  };
 }
+
+const g = globalThis as unknown as { __roamora?: Promise<Backend> };
+
+async function init(): Promise<Backend> {
+  const url = process.env.DATABASE_URL;
+  const b = url ? await connectPg(url) : await connectEmbedded();
+  await b.exec(SCHEMA);
+  const { rows } = await b.query('SELECT COUNT(*) AS n FROM destinations');
+  if (Number(rows[0].n) === 0) {
+    await b.tx(async c => {
+      for (const [i, x] of SEED.entries())
+        await c.run(
+          'INSERT INTO destinations (slug,name,state,type,days,price,best_time,tagline,about,highlights,itinerary,img,active,sort) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,1,$13) ON CONFLICT (slug) DO NOTHING',
+          [x.slug, x.name, x.state, x.type, x.days, x.price, x.bestTime, x.tagline, x.about, JSON.stringify(x.highlights), JSON.stringify(x.itinerary), x.img, i]
+        );
+    });
+  }
+  return b;
+}
+
+const backend = () => (g.__roamora ??= init().catch(e => { g.__roamora = undefined; throw e; }));
+
+/** PostgreSQL (DATABASE_URL) in production, embedded Postgres when DATABASE_URL is not set. */
+export const q: Conn['q'] = async (sql, p) => wrap(await backend()).q(sql, p);
+export const one: Conn['one'] = async (sql, p) => wrap(await backend()).one(sql, p);
+export const run: Conn['run'] = async (sql, p) => wrap(await backend()).run(sql, p);
+/** Runs several statements as one all-or-nothing transaction. */
+export const tx = async <T,>(fn: (c: Conn) => Promise<T>): Promise<T> => (await backend()).tx(fn);

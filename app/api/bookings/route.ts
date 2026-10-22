@@ -1,26 +1,25 @@
 import crypto from 'node:crypto';
 import { after, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { one, q, run } from '@/lib/db';
 import { currentUser } from '@/lib/auth';
 import { getDestination } from '@/lib/repo';
 import { quote } from '@/lib/pricing';
 import { paymentsEnabled } from '@/lib/razorpay';
-import { cleanName, cleanPhone } from '@/lib/validate';
 import { hit, HOUR, tooMany } from '@/lib/ratelimit';
 import { notifyBooking } from '@/lib/emails';
+import { cleanName, cleanPhone } from '@/lib/validate';
 
 export const dynamic = 'force-dynamic';
 const unauth = () => NextResponse.json({ error: 'Please log in to book.' }, { status: 401 });
 
-type Row = { id: number; ref: string; slug: string; name: string | null; travel_date: string; travellers: number; base: number; gst: number; total: number; status: string; created_at: number; share_token: string | null; reviewed: number };
+type Row = { id: number; ref: string; slug: string; name: string | null; travel_date: string; travellers: number; total: number; status: string; share_token: string | null; reviewed: boolean };
 
 export async function GET() {
   const u = await currentUser(); if (!u) return unauth();
-  const rows = db().prepare(
-    `SELECT b.id, b.ref, b.slug, d.name, b.travel_date, b.travellers, b.base, b.gst, b.total, b.status, b.created_at, b.share_token,
+  const rows = await q<Row>(
+    `SELECT b.id, b.ref, b.slug, d.name, b.travel_date, b.travellers, b.total, b.status, b.share_token,
             EXISTS(SELECT 1 FROM reviews r WHERE r.booking_id = b.id) AS reviewed
-       FROM bookings b LEFT JOIN destinations d ON d.slug = b.slug WHERE b.user_id = ? ORDER BY b.id DESC`
-  ).all(u.id) as unknown as Row[];
+       FROM bookings b LEFT JOIN destinations d ON d.slug = b.slug WHERE b.user_id = $1 ORDER BY b.id DESC`, [u.id]);
   const today = new Date().toISOString().slice(0, 10);
   const bookings = rows.map(r => ({
     id: r.id, ref: r.ref, slug: r.slug, name: r.name ?? r.slug, travel_date: r.travel_date, travellers: r.travellers,
@@ -33,10 +32,10 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const u = await currentUser(); if (!u) return unauth();
-  const wait = hit(`booking:${u.id}`, 10, HOUR);
+  const wait = await hit(`booking:${u.id}`, 10, HOUR);
   if (wait) return tooMany(wait);
   const b = await req.json().catch(() => ({}));
-  const d = typeof b.slug === 'string' ? getDestination(b.slug) : undefined;
+  const d = typeof b.slug === 'string' ? await getDestination(b.slug) : undefined;
   if (!d) return NextResponse.json({ error: 'Unknown destination.' }, { status: 400 });
 
   const travellers = Number(b.travellers);
@@ -50,19 +49,20 @@ export async function POST(req: Request) {
   if (!phone) return NextResponse.json({ error: 'Enter a valid 10-digit mobile number.' }, { status: 400 });
 
   // price is always computed on the server from the stored destination price
-  const q = quote(d.price, travellers);
+  const qt = quote(d.price, travellers);
   const ref = 'ROA-' + crypto.randomBytes(4).toString('hex').toUpperCase();
-  const ins = db().prepare('INSERT INTO bookings (ref, user_id, slug, travel_date, travellers, name, phone, base, gst, total, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)')
-    .run(ref, u.id, d.slug, date, travellers, name, phone, q.base, q.gst, q.total, Date.now());
-  after(() => notifyBooking('requested', Number(ins.lastInsertRowid)));
-  return NextResponse.json({ ref, total: q.total, status: 'requested' });
+  const ins = await one<{ id: number }>(
+    'INSERT INTO bookings (ref, user_id, slug, travel_date, travellers, name, phone, base, gst, total, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id',
+    [ref, u.id, d.slug, date, travellers, name, phone, qt.base, qt.gst, qt.total, Date.now()]);
+  after(() => notifyBooking('requested', ins!.id));
+  return NextResponse.json({ ref, total: qt.total, status: 'requested' });
 }
 
 export async function DELETE(req: Request) {
   const u = await currentUser(); if (!u) return unauth();
   const id = Number(new URL(req.url).searchParams.get('id'));
-  const r = db().prepare("UPDATE bookings SET status = 'cancelled' WHERE id = ? AND user_id = ? AND status IN ('requested','confirmed')").run(id, u.id);
-  if (r.changes) after(() => notifyBooking('cancelled', id));
-  if (!r.changes) return NextResponse.json({ error: 'This booking cannot be cancelled online. Paid trips need support to cancel.' }, { status: 400 });
+  const n = Number.isInteger(id) ? await run("UPDATE bookings SET status = 'cancelled' WHERE id = $1 AND user_id = $2 AND status IN ('requested','confirmed')", [id, u.id]) : 0;
+  if (n) after(() => notifyBooking('cancelled', id));
+  if (!n) return NextResponse.json({ error: 'This booking cannot be cancelled online. Paid trips need support to cancel.' }, { status: 400 });
   return NextResponse.json({ ok: true });
 }

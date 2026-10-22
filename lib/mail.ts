@@ -1,4 +1,4 @@
-import { db } from './db';
+import { run } from './db';
 import { mailConfigured } from './env';
 
 type Opts = { to: string; subject: string; text: string; html?: string; /** hide the body in the admin outbox (reset and verify links) */ sensitive?: boolean };
@@ -28,8 +28,8 @@ export async function sendMail({ to, subject, text, html, sensitive }: Opts) {
     console.log(`\n[email not sent: SMTP not configured]\nTo: ${to}\nSubject: ${subject}\n${text}\n`);
   }
   try {
-    db().prepare('INSERT INTO outbox (to_addr, subject, body, status, error, created_at) VALUES (?,?,?,?,?,?)')
-      .run(to, subject, sensitive ? '(contains a private link, not stored)' : text, status, error, Date.now());
+    await run('INSERT INTO outbox (to_addr, subject, body, status, error, created_at) VALUES ($1,$2,$3,$4,$5,$6)',
+      [to, subject, sensitive ? '(contains a private link, not stored)' : text, status, error, Date.now()]);
   } catch { /* never fail the request because of logging */ }
   return status;
 }

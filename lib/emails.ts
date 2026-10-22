@@ -1,4 +1,4 @@
-import { db } from './db';
+import { one } from './db';
 import { adminEmailList, siteUrl } from './env';
 import { inr } from './pricing';
 import { sendMail } from './mail';
@@ -21,10 +21,9 @@ const when = (d: string) => new Date(d + 'T00:00:00').toLocaleDateString('en-IN'
 /** Emails for a booking event. Never throws. Call it after the response is sent (see next/server `after`). */
 export async function notifyBooking(kind: 'requested' | 'confirmed' | 'paid' | 'cancelled', bookingId: number) {
   try {
-    const b = db().prepare(
+    const b = await one<B>(
       `SELECT b.id, b.ref, b.travel_date, b.travellers, b.total, b.status, b.slug, u.name AS user_name, u.email, d.name AS trip
-         FROM bookings b JOIN users u ON u.id = b.user_id LEFT JOIN destinations d ON d.slug = b.slug WHERE b.id = ?`
-    ).get(bookingId) as unknown as B | undefined;
+         FROM bookings b JOIN users u ON u.id = b.user_id LEFT JOIN destinations d ON d.slug = b.slug WHERE b.id = $1`, [bookingId]);
     if (!b) return;
     const trip = b.trip ?? b.slug, first = b.user_name.split(/\s+/)[0];
     const detail = `${trip} · ${when(b.travel_date)} · ${b.travellers} ${b.travellers === 1 ? 'traveller' : 'travellers'} · ${inr(b.total)} (GST included)`;

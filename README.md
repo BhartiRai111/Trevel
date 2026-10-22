@@ -9,7 +9,13 @@ npm run dev                     # http://localhost:3000
 npm run build && npm start
 ```
 
-Needs Node 22.13 or newer (uses Node's built-in SQLite, no database to install).
+Needs Node 20.9 or newer.
+
+## Database: PostgreSQL
+- **Production:** set `DATABASE_URL` to any PostgreSQL connection string (Neon, Supabase, Railway, AWS RDS, your own server). Tables are created automatically on first start and the 12 sample destinations are added.
+- **Local development:** leave `DATABASE_URL` empty. A real Postgres that runs inside Node (PGlite) is used and saved in `./data/pglite`. Nothing to install.
+- **Moving old data:** if you used the earlier SQLite version, copy it over once: start the app once with `DATABASE_URL` set (this creates the tables), then run `DATABASE_URL=... node scripts/sqlite-to-postgres.mjs data/roamora.db`.
+- Works on Vercel, Netlify and other serverless hosts as long as `DATABASE_URL` points to a hosted Postgres. Use the provider's pooled connection string on serverless, and set `PG_POOL_MAX=1` or `2` there.
 
 ## Features
 **Travellers**
@@ -39,7 +45,7 @@ Needs Node 22.13 or newer (uses Node's built-in SQLite, no database to install).
 1. **Admin access:** set `ADMIN_EMAILS` in `.env.local`, then register an account with that email. Register it first after deploying. Once SMTP is set up the admin must also click the verify link.
 2. **Email (SMTP):** set `SITE_URL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` and `MAIL_FROM` (Gmail app password, Brevo, Zoho, AWS SES and others work). Without `SMTP_HOST` nothing is sent; emails are only recorded in Admin > Emails (and printed to the server console when not in production).
 3. **Payments (optional):** set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET`. In the Razorpay dashboard add a webhook to `https://YOUR-SITE/api/payments/webhook` for `payment.captured` and put its secret in `RAZORPAY_WEBHOOK_SECRET`. Use test keys first. Without keys, confirmed bookings show "we will share payment details" and admins can use **Mark paid**.
-4. **Data:** on first run the 12 sample destinations are copied into `data/roamora.db` (git-ignored). After that, change them in `/admin`, not in code.
+4. **Data:** on first run the 12 sample destinations are copied into the database. After that, change them in `/admin`, not in code.
 
 ## Booking flow
 `requested` (traveller sends request) → `confirmed` (admin checks availability) → `paid` (Razorpay or admin marks paid). A traveller can cancel `requested` and `confirmed` bookings. Paid bookings must be cancelled by an admin, and refunds are done from the Razorpay dashboard (not automated).
@@ -48,11 +54,12 @@ Needs Node 22.13 or newer (uses Node's built-in SQLite, no database to install).
 - Sample prices, plans and photos are placeholders. Edit them in `/admin` (photos are Unsplash ids or any https image link).
 - Not built yet: SMS and automatic WhatsApp messages (WhatsApp Business API), trip reminder emails, automatic refunds, Hotels / Flights / Cars search.
 - Email sending was tested against a local test mail server, not against Gmail or another provider. Send yourself a test booking after you add your SMTP settings.
-- SQLite is fine for one server. On Vercel-style hosting use a hosted database instead.
+- Back up your database (most providers do this daily; check yours). Use SSL in `DATABASE_URL` (`?sslmode=require`) for hosted databases.
 - Razorpay calls could not be tested against the live API from the build environment. The payment signature check, webhook and booking status changes were tested; do a test-mode payment before going live.
 
 ## Folders
 - `app/` pages and API routes (`app/api/*`)
 - `components/` UI
-- `lib/` database, auth, pricing, Razorpay helpers
+- `lib/` database (`db.ts`), auth, pricing, Razorpay helpers
+- `scripts/sqlite-to-postgres.mjs` one-off data copy from the old SQLite version
 - `design/templates.html` the 10 hero templates that were reviewed

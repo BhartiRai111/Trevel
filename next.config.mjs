@@ -2,6 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // database drivers load their own files (WASM, native bits), so keep them out of the bundle
+  serverExternalPackages: ['pg', '@electric-sql/pglite'],
   images: { remotePatterns: [{ protocol: 'https', hostname: 'images.unsplash.com' }] },
   async headers() {
     return [{
