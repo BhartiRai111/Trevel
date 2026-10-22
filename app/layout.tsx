@@ -3,6 +3,7 @@ import './globals.css';
 import SiteProvider from '@/components/SiteProvider';
 import Navbar from '@/components/Navbar';
 import AuthModal from '@/components/AuthModal';
+import VerifyBanner from '@/components/VerifyBanner';
 import { Footer } from '@/components/HomeSections';
 import { allDestinations } from '@/lib/repo';
 
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <Footer />
           <AuthModal />
+          <VerifyBanner />
         </SiteProvider>
       </body>
     </html>

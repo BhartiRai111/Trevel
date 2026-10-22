@@ -1,11 +1,12 @@
 import crypto from 'node:crypto';
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { currentUser } from '@/lib/auth';
 import { getDestination } from '@/lib/repo';
 import { quote } from '@/lib/pricing';
 import { paymentsEnabled } from '@/lib/razorpay';
 import { cleanName, cleanPhone } from '@/lib/validate';
+import { notifyBooking } from '@/lib/emails';
 
 export const dynamic = 'force-dynamic';
 const unauth = () => NextResponse.json({ error: 'Please log in to book.' }, { status: 401 });
@@ -48,8 +49,9 @@ export async function POST(req: Request) {
   // price is always computed on the server from the stored destination price
   const q = quote(d.price, travellers);
   const ref = 'ROA-' + crypto.randomBytes(4).toString('hex').toUpperCase();
-  db().prepare('INSERT INTO bookings (ref, user_id, slug, travel_date, travellers, name, phone, base, gst, total, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)')
+  const ins = db().prepare('INSERT INTO bookings (ref, user_id, slug, travel_date, travellers, name, phone, base, gst, total, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)')
     .run(ref, u.id, d.slug, date, travellers, name, phone, q.base, q.gst, q.total, Date.now());
+  after(() => notifyBooking('requested', Number(ins.lastInsertRowid)));
   return NextResponse.json({ ref, total: q.total, status: 'requested' });
 }
 
@@ -57,6 +59,7 @@ export async function DELETE(req: Request) {
   const u = await currentUser(); if (!u) return unauth();
   const id = Number(new URL(req.url).searchParams.get('id'));
   const r = db().prepare("UPDATE bookings SET status = 'cancelled' WHERE id = ? AND user_id = ? AND status IN ('requested','confirmed')").run(id, u.id);
+  if (r.changes) after(() => notifyBooking('cancelled', id));
   if (!r.changes) return NextResponse.json({ error: 'This booking cannot be cancelled online. Paid trips need support to cancel.' }, { status: 400 });
   return NextResponse.json({ ok: true });
 }

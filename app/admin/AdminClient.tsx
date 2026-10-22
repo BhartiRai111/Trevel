@@ -8,27 +8,39 @@ import { useSite } from '@/components/SiteProvider';
 type Bk = { id: number; ref: string; trip: string | null; slug: string; travel_date: string; travellers: number; name: string; phone: string; email: string; total: number; status: string };
 type Stat = { status: string; n: number; amount: number };
 type Rv = { id: number; slug: string; rating: number; text: string; hidden: number; name: string };
+type Em = { id: number; to_addr: string; subject: string; body: string; status: string; error: string | null; created_at: number };
 type Form = { isNew: boolean; slug: string; name: string; state: string; type: string; days: string; price: string; bestTime: string; tagline: string; about: string; img: string; active: boolean; highlights: string; itinerary: string };
 
 const toForm = (d: Destination): Form => ({ isNew: false, slug: d.slug, name: d.name, state: d.state, type: d.type, days: String(d.days), price: String(d.price), bestTime: d.bestTime, tagline: d.tagline, about: d.about, img: d.img, active: d.active, highlights: d.highlights.join('\n'), itinerary: d.itinerary.map(i => `${i.title} | ${i.text}`).join('\n') });
+const waText = (b: Bk) => {
+  const t = b.trip ?? b.slug, f = b.name.split(/\s+/)[0];
+  const d = new Date(b.travel_date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  if (b.status === 'confirmed') return `Hi ${f}, your Roamora booking ${b.ref} for ${t} on ${d} is confirmed. Total ${inr(b.total)} (GST included). We will share the payment details here.`;
+  if (b.status === 'paid') return `Hi ${f}, we received your payment for ${t} (${b.ref}). Your trip on ${d} is booked. Thank you!`;
+  return `Hi ${f}, this is Roamora about your booking request ${b.ref} for ${t} on ${d}.`;
+};
+const wa = (b: Bk) => `https://wa.me/91${b.phone}?text=${encodeURIComponent(waText(b))}`;
 const blank: Form = { isNew: true, slug: '', name: '', state: '', type: 'heritage', days: '3', price: '10000', bestTime: '', tagline: '', about: '', img: '', active: true, highlights: '', itinerary: '' };
 
 export default function AdminClient() {
   const { user, ready, openAuth } = useSite();
   const router = useRouter();
-  const [tab, setTab] = useState<'bookings' | 'destinations' | 'reviews'>('bookings');
+  const [tab, setTab] = useState<'bookings' | 'destinations' | 'reviews' | 'emails'>('bookings');
   const [bookings, setBookings] = useState<Bk[]>([]);
   const [stats, setStats] = useState<Stat[]>([]);
   const [filter, setFilter] = useState('all');
   const [dests, setDests] = useState<Destination[]>([]);
   const [reviews, setReviews] = useState<Rv[]>([]);
+  const [emails, setEmails] = useState<Em[]>([]);
+  const [mailOn, setMailOn] = useState(false);
   const [form, setForm] = useState<Form | null>(null);
   const [msg, setMsg] = useState<{ t: string; ok: boolean } | null>(null);
 
   const loadB = useCallback(async () => { const r = await fetch('/api/admin/bookings'); if (r.ok) { const d = await r.json(); setBookings(d.bookings); setStats(d.stats); } }, []);
   const loadD = useCallback(async () => { const r = await fetch('/api/admin/destinations'); if (r.ok) setDests((await r.json()).destinations); }, []);
   const loadR = useCallback(async () => { const r = await fetch('/api/admin/reviews'); if (r.ok) setReviews((await r.json()).reviews); }, []);
-  useEffect(() => { if (user?.isAdmin) { loadB(); loadD(); loadR(); } }, [user, loadB, loadD, loadR]);
+  const loadE = useCallback(async () => { const r = await fetch('/api/admin/emails'); if (r.ok) { const d = await r.json(); setEmails(d.emails); setMailOn(d.configured); } }, []);
+  useEffect(() => { if (user?.isAdmin) { loadB(); loadD(); loadR(); loadE(); } }, [user, loadB, loadD, loadR, loadE]);
 
   async function act(id: number, action: string) {
     const r = await fetch('/api/admin/bookings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, action }) });
@@ -78,7 +90,7 @@ export default function AdminClient() {
         <div><b>{inr(stat('paid')?.amount ?? 0)}</b><span>Paid revenue (incl. GST)</span></div>
       </div>
       <div className="filters" role="tablist">
-        {(['bookings', 'destinations', 'reviews'] as const).map(t => <button key={t} role="tab" aria-selected={tab === t} className={`chip${tab === t ? ' on' : ''}`} type="button" onClick={() => { setTab(t); setMsg(null); }}>{t[0].toUpperCase() + t.slice(1)}</button>)}
+        {(['bookings', 'destinations', 'reviews', 'emails'] as const).map(t => <button key={t} role="tab" aria-selected={tab === t} className={`chip${tab === t ? ' on' : ''}`} type="button" onClick={() => { setTab(t); setMsg(null); }}>{t[0].toUpperCase() + t.slice(1)}</button>)}
       </div>
       {msg && <p className={`err dark${msg.ok ? ' okmsg' : ''}`} role="status">{msg.t}</p>}
 
@@ -92,6 +104,7 @@ export default function AdminClient() {
               <td className="acts">
                 {b.status === 'requested' && <button className="linkbtn" type="button" onClick={() => act(b.id, 'confirm')}>Confirm</button>}
                 {b.status === 'confirmed' && <button className="linkbtn" type="button" onClick={() => act(b.id, 'markpaid')}>Mark paid</button>}
+                <a className="linkbtn" target="_blank" rel="noreferrer" href={wa(b)}>WhatsApp</a>
                 {b.status !== 'cancelled' && <button className="linkbtn danger" type="button" onClick={() => act(b.id, 'cancel')}>Cancel</button>}
               </td></tr>))}
             {!shown.length && <tr><td colSpan={8}>No bookings here.</td></tr>}</tbody></table></div>
@@ -124,6 +137,14 @@ export default function AdminClient() {
               <td className="acts"><button className="linkbtn" type="button" onClick={() => setForm(toForm(d))}>Edit</button><button className="linkbtn" type="button" onClick={() => toggleActive(d)}>{d.active ? 'Hide' : 'Show'}</button></td></tr>))}</tbody></table></div>
         <p className="muted">Changing a price here does not change bookings that already exist; they keep the price they were made at.</p>
       </>)}
+
+      {tab === 'emails' && <>
+        <p className={mailOn ? 'muted' : 'err dark'}>{mailOn ? 'Email is connected. Every email the site sends is listed here.' : 'Email is not connected yet, so nothing is being sent. Add the SMTP settings from .env.example. Emails below were only recorded.'}</p>
+        <div className="tw"><table className="bt"><thead><tr><th>When</th><th>To</th><th>Subject</th><th>Status</th></tr></thead>
+          <tbody>{emails.map(e => (<tr key={e.id}><td>{new Date(e.created_at).toLocaleString('en-IN')}</td><td>{e.to_addr}</td><td>{e.subject}</td>
+            <td><span className={`st ${e.status === 'sent' ? 'confirmed' : e.status === 'failed' ? 'cancelled' : ''}`}>{e.status}</span>{e.error && <div className="muted">{e.error}</div>}</td></tr>))}
+            {!emails.length && <tr><td colSpan={4}>No emails yet.</td></tr>}</tbody></table></div>
+      </>}
 
       {tab === 'reviews' && (reviews.length === 0 ? <div className="empty"><p>No reviews yet.</p></div> : <ul className="rev admin">{reviews.map(r => (
         <li key={r.id}><div><span className="stars sm">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span> <b>{r.name}</b> on <i>{r.slug}</i> {r.hidden ? <span className="st cancelled">hidden</span> : null}</div><p>{r.text}</p>

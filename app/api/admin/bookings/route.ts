@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { notifyBooking } from '@/lib/emails';
 
 export const dynamic = 'force-dynamic';
 const deny = () => NextResponse.json({ error: 'Admins only.' }, { status: 403 });
@@ -29,5 +30,6 @@ export async function PATCH(req: Request) {
   const r = db().prepare(`UPDATE bookings SET status = ?, paid_at = CASE WHEN ? = 'paid' THEN ? ELSE paid_at END WHERE id = ? AND status IN (${rule.from.map(() => '?').join(',')})`)
     .run(rule.to, rule.to, Date.now(), Number(id), ...rule.from);
   if (!r.changes) return NextResponse.json({ error: `A booking in this status cannot be changed with "${action}".` }, { status: 400 });
+  after(() => notifyBooking(({ confirm: 'confirmed', cancel: 'cancelled', markpaid: 'paid' } as const)[action as 'confirm' | 'cancel' | 'markpaid'], Number(id)));
   return NextResponse.json({ ok: true });
 }

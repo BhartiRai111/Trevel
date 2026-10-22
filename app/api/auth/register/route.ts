@@ -1,6 +1,9 @@
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { hashPassword, isAdminEmail, startSession } from '@/lib/auth';
+import { createToken } from '@/lib/tokens';
+import { sendVerifyEmail } from '@/lib/emails';
+import { siteUrl } from '@/lib/env';
 import { cleanName, cleanPhone, isEmail } from '@/lib/validate';
 
 export async function POST(req: Request) {
@@ -18,6 +21,9 @@ export async function POST(req: Request) {
 
   const r = db().prepare('INSERT INTO users (name, email, phone, password_hash, created_at) VALUES (?, ?, ?, ?, ?)')
     .run(name, email, phone, hashPassword(b.password), Date.now());
-  await startSession(Number(r.lastInsertRowid));
-  return NextResponse.json({ user: { id: Number(r.lastInsertRowid), name, email, phone, isAdmin: isAdminEmail(email) } });
+  const id = Number(r.lastInsertRowid);
+  await startSession(id);
+  const link = `${siteUrl(req)}/verify?token=${createToken(id, 'verify')}`;
+  after(() => sendVerifyEmail(email, name, link));
+  return NextResponse.json({ user: { id, name, email, phone, isAdmin: isAdminEmail(email), emailVerified: false } });
 }

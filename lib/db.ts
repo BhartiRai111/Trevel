@@ -53,6 +53,14 @@ export function db(): DatabaseSync {
       order_id TEXT NOT NULL UNIQUE, payment_id TEXT, amount INTEGER NOT NULL,
       status TEXT NOT NULL DEFAULT 'created', created_at INTEGER NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS email_tokens (
+      token_hash TEXT PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      purpose TEXT NOT NULL, expires_at INTEGER NOT NULL, created_at INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS outbox (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, to_addr TEXT NOT NULL, subject TEXT NOT NULL, body TEXT NOT NULL,
+      status TEXT NOT NULL, error TEXT, created_at INTEGER NOT NULL
+    );
     CREATE TABLE IF NOT EXISTS reviews (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       booking_id INTEGER NOT NULL UNIQUE REFERENCES bookings(id) ON DELETE CASCADE,
@@ -63,6 +71,7 @@ export function db(): DatabaseSync {
   `);
   addCol(d, 'bookings', 'share_token', 'TEXT');
   addCol(d, 'bookings', 'paid_at', 'INTEGER');
+  addCol(d, 'users', 'email_verified', 'INTEGER NOT NULL DEFAULT 0');
   d.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_bookings_share ON bookings(share_token) WHERE share_token IS NOT NULL');
 
   const n = (d.prepare('SELECT COUNT(*) AS n FROM destinations').get() as unknown as { n: number }).n;
