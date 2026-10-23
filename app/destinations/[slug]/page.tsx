@@ -16,6 +16,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const Stars = ({ n }: { n: number }) => <span className="stars sm" aria-label={`${n.toFixed(1)} out of 5`}>{'★'.repeat(Math.round(n))}{'☆'.repeat(5 - Math.round(n))}</span>;
 
+const Icon = ({ kind }: { kind: ExploreKind }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    {kind === 'see' && <><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" /><circle cx="12" cy="10" r="2.5" /></>}
+    {kind === 'food' && <><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10" /><path d="M17 3c-2 2-3 5-3 8h3v10" /></>}
+    {kind === 'do' && <><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2 5-5 2 2-5z" /></>}
+  </svg>
+);
+
 const SECTIONS: { kind: ExploreKind; id: string }[] = [{ kind: 'see', id: 'places' }, { kind: 'food', id: 'food' }, { kind: 'do', id: 'things' }];
 
 function Explore({ d }: { d: Destination }) {
@@ -33,9 +41,11 @@ function Explore({ d }: { d: Destination }) {
         <section key={g.id} id={g.id} className="xsec">
           <h2>{EXPLORE_KIND_LABEL[g.kind]} in {d.name}</h2>
           <div className="xgrid">
-            {g.list.map((i, n) => (
-              <article key={i.name} className="xcard">
-                <div className="xph" style={{ backgroundImage: `url('${img(i.img || d.img, 600, 70)}'), linear-gradient(135deg,#0f8f86,#073a37)`, ...(i.img ? {} : { backgroundSize: '170% auto, cover', backgroundPosition: `${[15, 85, 50, 25, 75, 40][n % 6]}% ${[30, 60, 20, 70, 40, 80][n % 6]}%, center` }) }} role="img" aria-label={i.name} />
+            {g.list.map(i => (
+              <article key={i.name} className={`xcard${i.img ? '' : ' noimg'}`}>
+                {i.img
+                  ? <div className="xph" style={{ backgroundImage: `url('${img(i.img, 600, 70)}'), linear-gradient(135deg,#0f8f86,#073a37)` }} role="img" aria-label={i.name} />
+                  : <span className="xico" aria-hidden="true"><Icon kind={g.kind} /></span>}
                 <div className="xbody">{i.type && <span className="tag2">{i.type}</span>}<h3>{i.name}</h3><p>{i.text}</p></div>
               </article>
             ))}
@@ -53,7 +63,7 @@ function Explore({ d }: { d: Destination }) {
           </div>
         </section>
       )}
-      <p className="sample" role="note">Sample information to help you plan. Please check opening times, permits, seasons and prices before you go. Restaurants and activities are suggestions, not bookings or live availability.</p>
+      <p className="sample" role="note">{d.img.startsWith('/photos/') && <>Photos: Wikimedia Commons contributors, see <Link href={`/credits#${d.slug}`}>photo credits</Link>. </>}Sample information to help you plan. Please check opening times, permits, seasons and prices before you go. Restaurants and activities are suggestions, not bookings or live availability.</p>
     </>
   );
 }
@@ -64,7 +74,7 @@ export default async function DestinationPage({ params }: Props) {
   const rv = await reviewsFor(d.slug);
   return (
     <main>
-      <section className="dhero photo" style={{ ['--img' as string]: `url('${img(d.img, 2000, 80)}')` }}>
+      <section className="dhero photo" style={{ ['--img' as string]: (d.img ? `url('${img(d.img, 2000, 80)}')` : 'none') }}>
         <div className="dh-in">
           <p className="eyebrow">{d.state} · {TYPE_LABEL[d.type]}</p>
           <h1>{d.name}</h1>

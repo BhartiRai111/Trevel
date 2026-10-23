@@ -4,7 +4,8 @@ import { useRouter } from 'next/navigation';
 import { img } from '@/lib/destinations';
 import { CAR_TYPES, CITIES } from '@/lib/catalogMeta';
 
-const SLIDES = ['photo-1564507592333-c60657eea523', 'photo-1602216056096-3b40cc0c9944', 'photo-1512343879784-a960bf40e7f2', 'photo-1626015365107-2cfd4e8e3e19'];
+/** Real photographs from public/photos (credits on /credits) */
+const SLIDES = ['/photos/leh-ladakh/nubra-valley-dunes.jpg', '/photos/kerala/alleppey-houseboats.jpg', '/photos/darjeeling/tiger-hill-kanchenjunga.jpg', '/photos/manali/solang-valley.jpg'];
 
 type Field = { name: string; label: string; kind: 'text' | 'date' | 'select'; hint?: string; cities?: boolean; options?: [string, string][] };
 const people = (word: string): [string, string][] => [1, 2, 3, 4, 5, 6].map(n => [String(n), `${n} ${word}${n > 1 ? 's' : ''}`]);

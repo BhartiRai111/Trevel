@@ -24,6 +24,14 @@ Needs Node 20.9 or newer.
 - **Cars with driver** (`/cars`): search by city, dates and type. Rate per day (driver, fuel and tolls for 250 km a day included) plus 5% GST.
 - Every booking is a request: `requested` → `confirmed` by you → `paid`. Prices are always recalculated on the server. All four kinds show up in My trips, in emails and in the admin booking list.
 
+**Real photographs (Wikimedia Commons)**
+- Photos of places are real photographs from Wikimedia Commons, saved in `destination-photos/` (originals) and resized into `public/photos/` by `node scripts/build-photos.mjs`. Nothing is hotlinked.
+- Every photo has its photographer, licence and source link on the site at **/credits** (also linked from the footer and from each destination page). Licences used: CC BY-SA, CC BY, CC0, public domain. CC BY-SA photos need credit and the resized copies stay under CC BY-SA; the credits page says so.
+- `scripts/photos.manifest.json` decides which photo is used where (main photo, background photos, which guide card). A photo is only built into the site if its credits row has an author and a licence.
+- **Photos live for:** Goa, Manali, Darjeeling, Leh Ladakh, Andaman, Kerala, Rishikesh. A guide card shows a photo only when one really shows that place; otherwise it is a clean text card.
+- **Still waiting for credited photos:** Agra, Jaipur, Udaipur, Hampi, Varanasi. Their pages show no photo rather than a stock photo that might be the wrong place. Files for Agra, Jaipur, Hampi and Varanasi are in `destination-photos/` but have no credits yet: run `node scripts/commons-credits.mjs` on a computer with internet (it asks Commons for each photo's author and licence and writes `destination-photos/photo_credits_extra.csv`), then add them to the manifest and run `node scripts/build-photos.mjs`.
+- Hotels and cars still use sample stock-photo links, because their listings are sample data. Replace them in Admin with photos of your real hotels and cars.
+
 **Animated background on every page**
 - Every page except the home page (which has its own slideshow) has a full-screen animated background: slow zoom and pan, photos fading into each other, under a teal gradient. Content sits on a light panel below a title band. It switches off when the visitor has "reduce motion" turned on.
 - It follows the place: a destination page uses that destination's photos (Goa shows Goa, Manali shows Manali and so on, including its booking page); hotel and car pages use their own photo; hotel, car, flight and tour searches that name a place (for example `?city=goa`) use that destination; other pages rotate through the destination photos.
@@ -82,4 +90,5 @@ Needs Node 20.9 or newer.
 - `components/` UI
 - `lib/` database (`db.ts`), auth, pricing, Razorpay helpers
 - `scripts/sqlite-to-postgres.mjs` one-off data copy from the old SQLite version
+- `public/photos/` web-sized photos, `destination-photos/` originals and credits, `scripts/` photo tools
 - `design/templates.html` the 10 hero templates that were reviewed

@@ -1,0 +1,208 @@
+[
+  {
+    "dest": "goa-beaches",
+    "folder": "goa",
+    "src": "goa/goa-02-palolem-beach.jpg",
+    "out": "palolem-beach",
+    "hero": true,
+    "bg": true,
+    "item": "Palolem Beach",
+    "alt": "Palolem Beach, South Goa, with a boat and a wooded island",
+    "crop": {
+      "topPct": 30
+    }
+  },
+  {
+    "dest": "goa-beaches",
+    "folder": "goa",
+    "src": "goa/goa-04-basilica-of-bom-jesus.jpg",
+    "out": "basilica-of-bom-jesus",
+    "bg": true,
+    "item": "Basilica of Bom Jesus, Old Goa",
+    "alt": "Basilica of Bom Jesus, Old Goa"
+  },
+  {
+    "dest": "manali-snow",
+    "folder": "manali",
+    "src": "manali/manali-01-solang-valley.jpg",
+    "out": "solang-valley",
+    "hero": true,
+    "bg": true,
+    "item": "Solang Valley",
+    "alt": "Snow-covered Solang Valley with the Himalayas behind"
+  },
+  {
+    "dest": "manali-snow",
+    "folder": "manali",
+    "src": "manali/manali-02-hadimba-devi-temple.jpg",
+    "out": "hadimba-devi-temple",
+    "item": "Hadimba Devi Temple",
+    "alt": "The wooden roof of Hadimba Devi Temple among cedar trees"
+  },
+  {
+    "dest": "manali-snow",
+    "folder": "manali",
+    "src": "manali/manali-03-old-manali-and-beas-river.jpg",
+    "out": "old-manali-beas-river",
+    "bg": true,
+    "item": "Old Manali",
+    "alt": "The Beas river and a lane in Old Manali in the evening"
+  },
+  {
+    "dest": "darjeeling-hills",
+    "folder": "darjeeling",
+    "src": "darjeeling/darjeeling-01-tiger-hill-and-kanchenjunga.jpg",
+    "out": "tiger-hill-kanchenjunga",
+    "hero": true,
+    "bg": true,
+    "item": "Tiger Hill sunrise",
+    "alt": "Sunrise sky over the Kanchenjunga range seen from Tiger Hill"
+  },
+  {
+    "dest": "darjeeling-hills",
+    "folder": "darjeeling",
+    "src": "darjeeling/darjeeling-02-darjeeling-himalayan-railway.jpg",
+    "out": "himalayan-railway",
+    "bg": true,
+    "item": "Darjeeling Himalayan Railway",
+    "alt": "A blue Darjeeling Himalayan Railway locomotive at a station"
+  },
+  {
+    "dest": "darjeeling-hills",
+    "folder": "darjeeling",
+    "src": "darjeeling/darjeeling-03-happy-valley-tea-estate.jpg",
+    "out": "happy-valley-tea-estate",
+    "bg": true,
+    "item": "Happy Valley Tea Estate",
+    "alt": "Misty tea-covered hillside near Darjeeling"
+  },
+  {
+    "dest": "darjeeling-hills",
+    "folder": "darjeeling",
+    "src": "darjeeling/darjeeling-04-batasia-loop.jpg",
+    "out": "batasia-loop",
+    "item": "Batasia Loop and War Memorial",
+    "alt": "The garden at Batasia Loop near Darjeeling"
+  },
+  {
+    "dest": "ladakh-leh",
+    "folder": "leh-ladakh",
+    "src": "leh-ladakh/leh-ladakh-02-nubra-valley-dunes.jpg",
+    "out": "nubra-valley-dunes",
+    "hero": true,
+    "bg": true,
+    "item": "Nubra Valley",
+    "alt": "Camels crossing the dunes of Nubra Valley below snow peaks"
+  },
+  {
+    "dest": "ladakh-leh",
+    "folder": "leh-ladakh",
+    "src": "leh-ladakh/leh-ladakh-04-shanti-stupa-or-leh-palace.jpg",
+    "out": "shanti-stupa",
+    "bg": true,
+    "item": "Shanti Stupa, Leh",
+    "alt": "Shanti Stupa in Leh under a blue sky"
+  },
+  {
+    "dest": "ladakh-leh",
+    "folder": "leh-ladakh",
+    "src": "leh-ladakh/leh-ladakh-01-pangong-tso.jpg",
+    "out": "pangong-tso",
+    "item": "Pangong Tso",
+    "alt": "Pangong Tso lake panorama"
+  },
+  {
+    "dest": "ladakh-leh",
+    "folder": "leh-ladakh",
+    "src": "leh-ladakh/leh-ladakh-03-thiksey-monastery.jpg",
+    "out": "indus-valley-from-thiksey",
+    "item": "Thiksey Monastery",
+    "alt": "The Indus Valley seen from Thiksey Gompa"
+  },
+  {
+    "dest": "andaman-islands",
+    "folder": "andaman",
+    "src": "andaman/andaman-01-radhanagar-beach.jpg",
+    "out": "radhanagar-beach",
+    "hero": true,
+    "bg": true,
+    "item": "Radhanagar Beach, Havelock",
+    "alt": "Radhanagar Beach, Havelock Island, under a monsoon sky"
+  },
+  {
+    "dest": "andaman-islands",
+    "folder": "andaman",
+    "src": "andaman/andaman-04-ross-island.jpg",
+    "out": "ross-island",
+    "bg": true,
+    "item": "Ross Island",
+    "alt": "A red brick building among palm trees on Ross Island"
+  },
+  {
+    "dest": "andaman-islands",
+    "folder": "andaman",
+    "src": "andaman/andaman-03-elephant-beach-or-neil-island.jpg",
+    "out": "elephant-beach-boat",
+    "bg": true,
+    "item": "Elephant Beach",
+    "crop": {
+      "bottomPct": 8
+    },
+    "alt": "A boat off Elephant Beach, Havelock Island"
+  },
+  {
+    "dest": "kerala-backwaters",
+    "folder": "kerala",
+    "src": "kerala/kerala-01-alleppey-backwaters-and-houseboat.jpg",
+    "out": "alleppey-houseboats",
+    "hero": true,
+    "bg": true,
+    "item": "Alleppey (Alappuzha) backwaters",
+    "alt": "Houseboats on the Alleppey backwaters at golden hour"
+  },
+  {
+    "dest": "kerala-backwaters",
+    "folder": "kerala",
+    "src": "kerala/kerala-03-fort-kochi-chinese-fishing-nets.jpg",
+    "out": "chinese-fishing-nets",
+    "bg": true,
+    "item": "Fort Kochi and the Chinese fishing nets",
+    "alt": "Chinese fishing nets at Fort Kochi"
+  },
+  {
+    "dest": "kerala-backwaters",
+    "folder": "kerala",
+    "src": "kerala/kerala-04-athirappilly-falls.jpg",
+    "out": "athirappilly-falls",
+    "bg": true,
+    "item": "Athirappilly Falls",
+    "alt": "Athirappilly Falls surrounded by forest"
+  },
+  {
+    "dest": "rishikesh-adventure",
+    "folder": "rishikesh",
+    "src": "rishikesh/rishikesh-04-ganga-valley-view.jpg",
+    "out": "ganga-and-hills",
+    "hero": true,
+    "bg": true,
+    "item": "Laxman Jhula and Ram Jhula",
+    "alt": "The Ganga at Rishikesh with a suspension bridge and hills"
+  },
+  {
+    "dest": "rishikesh-adventure",
+    "folder": "rishikesh",
+    "src": "rishikesh/rishikesh-02-triveni-ghat-aarti.jpg",
+    "out": "triveni-ghat-aarti",
+    "bg": true,
+    "item": "Triveni Ghat aarti",
+    "alt": "Evening Ganga aarti at Triveni Ghat"
+  },
+  {
+    "dest": "rishikesh-adventure",
+    "folder": "rishikesh",
+    "src": "rishikesh/rishikesh-03-river-rafting.jpg",
+    "out": "ganga-near-kaudiyala",
+    "bg": true,
+    "alt": "The Ganga flowing through a forested valley near Kaudiyala"
+  }
+]

@@ -20,7 +20,7 @@ export default async function SharedTrip({ params }: { params: Promise<{ token: 
   const date = new Date(b.travel_date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
   return (
     <main>
-      <section className="dhero photo" style={{ ['--img' as string]: `url('${img(d.img, 2000, 80)}')` }}>
+      <section className="dhero photo" style={{ ['--img' as string]: (d.img ? `url('${img(d.img, 2000, 80)}')` : 'none') }}>
         <div className="dh-in">
           <p className="eyebrow">{first}&apos;s trip</p>
           <h1>{d.name}</h1>

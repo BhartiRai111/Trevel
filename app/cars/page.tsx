@@ -30,7 +30,7 @@ export default async function CarsPage({ searchParams }: { searchParams: SP }) {
       {cars.length === 0 ? <div className="empty"><p>No cars match. Try another city or type.</p><Link className="btn btn-dark inline" href="/cars">Clear search</Link></div> : (
         <ul className="rlist">{cars.map(c => (
           <li key={c.slug} className="rcard">
-            <div className="rimg" style={{ backgroundImage: `url('${img(c.img, 600, 70)}')` }} role="img" aria-label={c.name} />
+            <div className="rimg" style={{ backgroundImage: (c.img ? `url('${img(c.img, 600, 70)}')` : 'none') }} role="img" aria-label={c.name} />
             <div className="rbody">
               <div><h2>{c.name}</h2><p className="muted">{c.city} · {c.type} · seats {c.seats}</p><p className="chips2"><span>Driver included</span><span>Fuel and tolls included</span><span>250 km/day</span></p></div>
               <div className="rprice"><b>{inr(c.price)}</b><span className="muted"> per day</span>

@@ -47,8 +47,12 @@ export const TYPE_LABEL: Record<DestType, string> = {
   mountain: 'Mountains', beach: 'Beaches', heritage: 'Heritage', spiritual: 'Spiritual', nature: 'Nature & Adventure'
 };
 
-export const img = (id: string, w = 900, q = 75) =>
-  /^https?:\/\//.test(id) ? id : `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=${q}`;
+/** Photo address. "/photos/..." are our own files (a small -sm copy exists for cards), https links are used as they are, "photo-..." are Unsplash ids. */
+export const img = (id: string, w = 900, q = 75) => {
+  if (!id) return '';
+  if (id.startsWith('/photos/')) return w <= 1000 ? id.replace(/\.jpg$/, '-sm.jpg') : id;
+  return /^https?:\/\//.test(id) ? id : `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=${q}`;
+};
 
 export const INCLUSIONS = ['Hotel stay with breakfast', 'Local guide', 'Airport / station pickup and drop', 'All local transfers'];
 
@@ -66,3 +70,7 @@ export function makeItinerary(d: Pick<Destination, 'name' | 'days' | 'highlights
   }
   return out;
 }
+
+const PLAIN = 'linear-gradient(135deg,#0f8f86,#073a37)';
+/** CSS background for a photo, with a teal fallback; plain teal when there is no photo. */
+export const bg = (id: string, w = 900, q = 75) => (id ? `url('${img(id, w, q)}'), ${PLAIN}` : PLAIN);

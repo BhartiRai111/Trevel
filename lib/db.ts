@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { SEED } from './seedDestinations';
+import { ORIGINAL_IMG, PHOTOS, SEED } from './seedDestinations';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type Row = Record<string, any>;
@@ -148,6 +148,30 @@ async function init(): Promise<Backend> {
       } catch { /* leave a row we cannot read untouched */ }
     }
     await b.query("INSERT INTO meta (key, value) VALUES ('guide-photos-v2', '1') ON CONFLICT (key) DO NOTHING");
+  }
+  // one-time: move destinations to the real local photos, and drop the generic stock food photos (cards without a real photo become text cards)
+  const localDone = await b.query("SELECT 1 FROM meta WHERE key = 'local-photos-v1'");
+  if (!localDone.rows.length) {
+    const FOOD_STOCK = new Set(['photo-1504674900247-0877df9cc836', 'photo-1495474472287-4d71bcdd2085']);
+    const rows = (await b.query('SELECT slug, img, gallery, explore FROM destinations')).rows;
+    for (const r of rows) {
+      const plan = PHOTOS[r.slug as string];
+      let img = r.img as string, gallery = r.gallery as string, explore = r.explore as string;
+      if (img === ORIGINAL_IMG[r.slug as string]) img = plan?.hero ?? '';                               // untouched stock photo -> our real photo, or none until one with credits exists
+      if (plan && (!gallery || gallery === '[]')) gallery = JSON.stringify(plan.gallery);               // no background photos yet -> add ours
+      if (explore) {
+        try {
+          const ex = JSON.parse(explore);
+          for (const it of ex.items ?? []) {
+            if (FOOD_STOCK.has(it.img)) it.img = '';
+            if (plan?.items[it.name as string] && !it.img) it.img = plan.items[it.name as string];      // keep any photo an admin set
+          }
+          explore = JSON.stringify(ex);
+        } catch { /* leave unreadable rows as they are */ }
+      }
+      await b.query('UPDATE destinations SET img = $1, gallery = $2, explore = $3 WHERE slug = $4', [img, gallery, explore, r.slug]);
+    }
+    await b.query("INSERT INTO meta (key, value) VALUES ('local-photos-v1', '1') ON CONFLICT (key) DO NOTHING");
   }
   // databases from before the guide pages: fill the sample guide and packages for rows that still have none (edited rows are never touched)
   for (const x of SEED) await b.query("UPDATE destinations SET explore = $1, packages = $2 WHERE slug = $3 AND explore = ''", [JSON.stringify(x.explore), JSON.stringify(x.packages), x.slug]);

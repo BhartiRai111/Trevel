@@ -1,0 +1,439 @@
+{
+  "dest": {
+    "goa-beaches": {
+      "hero": "/photos/goa/palolem-beach.jpg",
+      "gallery": [
+        "/photos/goa/basilica-of-bom-jesus.jpg"
+      ],
+      "items": {
+        "Palolem Beach": "/photos/goa/palolem-beach.jpg",
+        "Basilica of Bom Jesus, Old Goa": "/photos/goa/basilica-of-bom-jesus.jpg"
+      }
+    },
+    "manali-snow": {
+      "hero": "/photos/manali/solang-valley.jpg",
+      "gallery": [
+        "/photos/manali/old-manali-beas-river.jpg"
+      ],
+      "items": {
+        "Solang Valley": "/photos/manali/solang-valley.jpg",
+        "Hadimba Devi Temple": "/photos/manali/hadimba-devi-temple.jpg",
+        "Old Manali": "/photos/manali/old-manali-beas-river.jpg"
+      }
+    },
+    "darjeeling-hills": {
+      "hero": "/photos/darjeeling/tiger-hill-kanchenjunga.jpg",
+      "gallery": [
+        "/photos/darjeeling/himalayan-railway.jpg",
+        "/photos/darjeeling/happy-valley-tea-estate.jpg"
+      ],
+      "items": {
+        "Tiger Hill sunrise": "/photos/darjeeling/tiger-hill-kanchenjunga.jpg",
+        "Darjeeling Himalayan Railway": "/photos/darjeeling/himalayan-railway.jpg",
+        "Happy Valley Tea Estate": "/photos/darjeeling/happy-valley-tea-estate.jpg",
+        "Batasia Loop and War Memorial": "/photos/darjeeling/batasia-loop.jpg"
+      }
+    },
+    "ladakh-leh": {
+      "hero": "/photos/leh-ladakh/nubra-valley-dunes.jpg",
+      "gallery": [
+        "/photos/leh-ladakh/shanti-stupa.jpg"
+      ],
+      "items": {
+        "Nubra Valley": "/photos/leh-ladakh/nubra-valley-dunes.jpg",
+        "Shanti Stupa, Leh": "/photos/leh-ladakh/shanti-stupa.jpg",
+        "Pangong Tso": "/photos/leh-ladakh/pangong-tso.jpg",
+        "Thiksey Monastery": "/photos/leh-ladakh/indus-valley-from-thiksey.jpg"
+      }
+    },
+    "andaman-islands": {
+      "hero": "/photos/andaman/radhanagar-beach.jpg",
+      "gallery": [
+        "/photos/andaman/ross-island.jpg",
+        "/photos/andaman/elephant-beach-boat.jpg"
+      ],
+      "items": {
+        "Radhanagar Beach, Havelock": "/photos/andaman/radhanagar-beach.jpg",
+        "Ross Island": "/photos/andaman/ross-island.jpg",
+        "Elephant Beach": "/photos/andaman/elephant-beach-boat.jpg"
+      }
+    },
+    "kerala-backwaters": {
+      "hero": "/photos/kerala/alleppey-houseboats.jpg",
+      "gallery": [
+        "/photos/kerala/chinese-fishing-nets.jpg",
+        "/photos/kerala/athirappilly-falls.jpg"
+      ],
+      "items": {
+        "Alleppey (Alappuzha) backwaters": "/photos/kerala/alleppey-houseboats.jpg",
+        "Fort Kochi and the Chinese fishing nets": "/photos/kerala/chinese-fishing-nets.jpg",
+        "Athirappilly Falls": "/photos/kerala/athirappilly-falls.jpg"
+      }
+    },
+    "rishikesh-adventure": {
+      "hero": "/photos/rishikesh/ganga-and-hills.jpg",
+      "gallery": [
+        "/photos/rishikesh/triveni-ghat-aarti.jpg",
+        "/photos/rishikesh/ganga-near-kaudiyala.jpg"
+      ],
+      "items": {
+        "Laxman Jhula and Ram Jhula": "/photos/rishikesh/ganga-and-hills.jpg",
+        "Triveni Ghat aarti": "/photos/rishikesh/triveni-ghat-aarti.jpg"
+      }
+    }
+  },
+  "credits": [
+    {
+      "dest": "goa-beaches",
+      "folder": "goa",
+      "path": "/photos/goa/palolem-beach.jpg",
+      "thumb": "/photos/goa/palolem-beach-sm.jpg",
+      "width": 1920,
+      "height": 776,
+      "alt": "Palolem Beach, South Goa, with a boat and a wooded island",
+      "place": "Palolem Beach",
+      "title": "Palolem Beach, south Goa.jpg",
+      "creator": "Mahabalaindia",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3APalolem_Beach%2C_south_Goa.jpg",
+      "changes": "Resized and cropped"
+    },
+    {
+      "dest": "goa-beaches",
+      "folder": "goa",
+      "path": "/photos/goa/basilica-of-bom-jesus.jpg",
+      "thumb": "/photos/goa/basilica-of-bom-jesus-sm.jpg",
+      "width": 1920,
+      "height": 1130,
+      "alt": "Basilica of Bom Jesus, Old Goa",
+      "place": "Basilica of Bom Jesus",
+      "title": "Basilica of Bom Jesus and vehicles parked infront.jpg",
+      "creator": "iMahesh",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3ABasilica_of_Bom_Jesus_and_vehicles_parked_infront.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "manali-snow",
+      "folder": "manali",
+      "path": "/photos/manali/solang-valley.jpg",
+      "thumb": "/photos/manali/solang-valley-sm.jpg",
+      "width": 1920,
+      "height": 1277,
+      "alt": "Snow-covered Solang Valley with the Himalayas behind",
+      "place": "Solang Valley",
+      "title": "Solang valley under snow, 2015.jpg",
+      "creator": "Bleezebub",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3ASolang_valley_under_snow%2C_2015.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "manali-snow",
+      "folder": "manali",
+      "path": "/photos/manali/hadimba-devi-temple.jpg",
+      "thumb": "/photos/manali/hadimba-devi-temple-sm.jpg",
+      "width": 1920,
+      "height": 1080,
+      "alt": "The wooden roof of Hadimba Devi Temple among cedar trees",
+      "place": "Hadimba Devi Temple",
+      "title": "Hadimba Devi Temple Manali.jpg",
+      "creator": "Itsarti",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3AHadimba_Devi_Temple_Manali.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "manali-snow",
+      "folder": "manali",
+      "path": "/photos/manali/old-manali-beas-river.jpg",
+      "thumb": "/photos/manali/old-manali-beas-river-sm.jpg",
+      "width": 1920,
+      "height": 1281,
+      "alt": "The Beas river and a lane in Old Manali in the evening",
+      "place": "Old Manali and Beas River",
+      "title": "Old manali.jpg",
+      "creator": "Nrr1729",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3AOld_manali.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "darjeeling-hills",
+      "folder": "darjeeling",
+      "path": "/photos/darjeeling/tiger-hill-kanchenjunga.jpg",
+      "thumb": "/photos/darjeeling/tiger-hill-kanchenjunga-sm.jpg",
+      "width": 1920,
+      "height": 1440,
+      "alt": "Sunrise sky over the Kanchenjunga range seen from Tiger Hill",
+      "place": "Tiger Hill and Kanchenjunga",
+      "title": "The majestic kanchenjunga.jpg",
+      "creator": "K94t",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3AThe_majestic_kanchenjunga.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "darjeeling-hills",
+      "folder": "darjeeling",
+      "path": "/photos/darjeeling/himalayan-railway.jpg",
+      "thumb": "/photos/darjeeling/himalayan-railway-sm.jpg",
+      "width": 1920,
+      "height": 1537,
+      "alt": "A blue Darjeeling Himalayan Railway locomotive at a station",
+      "place": "Darjeeling Himalayan Railway",
+      "title": "Darjeeling Himalayan Railway Diesel Locomotive.jpg",
+      "creator": "Subhrajyoti07",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3ADarjeeling_Himalayan_Railway_Diesel_Locomotive.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "darjeeling-hills",
+      "folder": "darjeeling",
+      "path": "/photos/darjeeling/happy-valley-tea-estate.jpg",
+      "thumb": "/photos/darjeeling/happy-valley-tea-estate-sm.jpg",
+      "width": 1920,
+      "height": 1280,
+      "alt": "Misty tea-covered hillside near Darjeeling",
+      "place": "Happy Valley Tea Estate",
+      "title": "Happy Valley Tea Estate, Darjeeling, India.jpg",
+      "creator": "Mr. Debapriya Hore",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3AHappy_Valley_Tea_Estate%2C_Darjeeling%2C_India.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "darjeeling-hills",
+      "folder": "darjeeling",
+      "path": "/photos/darjeeling/batasia-loop.jpg",
+      "thumb": "/photos/darjeeling/batasia-loop-sm.jpg",
+      "width": 1920,
+      "height": 1280,
+      "alt": "The garden at Batasia Loop near Darjeeling",
+      "place": "Batasia Loop",
+      "title": "Batasia Loop near Darjeeling 08.jpg",
+      "creator": "Pinakpani",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3ABatasia_Loop_near_Darjeeling_08.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "ladakh-leh",
+      "folder": "leh-ladakh",
+      "path": "/photos/leh-ladakh/nubra-valley-dunes.jpg",
+      "thumb": "/photos/leh-ladakh/nubra-valley-dunes-sm.jpg",
+      "width": 1920,
+      "height": 1281,
+      "alt": "Camels crossing the dunes of Nubra Valley below snow peaks",
+      "place": "Nubra Valley dunes",
+      "title": "Sand dunes of Nubra Valley, Ladakh.jpg",
+      "creator": "Mohanrangaphotography",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3ASand_dunes_of_Nubra_Valley%2C_Ladakh.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "ladakh-leh",
+      "folder": "leh-ladakh",
+      "path": "/photos/leh-ladakh/shanti-stupa.jpg",
+      "thumb": "/photos/leh-ladakh/shanti-stupa-sm.jpg",
+      "width": 1920,
+      "height": 1280,
+      "alt": "Shanti Stupa in Leh under a blue sky",
+      "place": "Shanti Stupa or Leh Palace",
+      "title": "Shanti Stupa Ladakh.jpg",
+      "creator": "ClickAR89",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3AShanti_Stupa_Ladakh.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "ladakh-leh",
+      "folder": "leh-ladakh",
+      "path": "/photos/leh-ladakh/pangong-tso.jpg",
+      "thumb": "/photos/leh-ladakh/pangong-tso-sm.jpg",
+      "width": 1920,
+      "height": 621,
+      "alt": "Pangong Tso lake panorama",
+      "place": "Pangong Tso",
+      "title": "Panoramic view of Pnagong lake, Pangong Tso, view form Pangong Lake Rd, 194201.jpg",
+      "creator": "Krzysztof Popławski",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3APanoramic_view_of_Pnagong_lake%2C_Pangong_Tso%2C_view_form_Pangong_Lake_Rd%2C_194201.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "ladakh-leh",
+      "folder": "leh-ladakh",
+      "path": "/photos/leh-ladakh/indus-valley-from-thiksey.jpg",
+      "thumb": "/photos/leh-ladakh/indus-valley-from-thiksey-sm.jpg",
+      "width": 1920,
+      "height": 557,
+      "alt": "The Indus Valley seen from Thiksey Gompa",
+      "place": "Thiksey Monastery",
+      "title": "View of Indus Valley from Thikse Gompa, Ladakh, India.jpg",
+      "creator": "Ingo Mehling",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3AView_of_Indus_Valley_from_Thikse_Gompa%2C_Ladakh%2C_India.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "andaman-islands",
+      "folder": "andaman",
+      "path": "/photos/andaman/radhanagar-beach.jpg",
+      "thumb": "/photos/andaman/radhanagar-beach-sm.jpg",
+      "width": 1920,
+      "height": 1440,
+      "alt": "Radhanagar Beach, Havelock Island, under a monsoon sky",
+      "place": "Radhanagar Beach",
+      "title": "RadhaNagar Beach, Havelock Island, Andaman & Nicobar Islands.jpg",
+      "creator": "Shristi Shreyasi",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3ARadhaNagar_Beach%2C_Havelock_Island%2C_Andaman_%26_Nicobar_Islands.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "andaman-islands",
+      "folder": "andaman",
+      "path": "/photos/andaman/ross-island.jpg",
+      "thumb": "/photos/andaman/ross-island-sm.jpg",
+      "width": 1920,
+      "height": 1280,
+      "alt": "A red brick building among palm trees on Ross Island",
+      "place": "Ross Island",
+      "title": "Farzad Ali Store, Ross Island, Andaman.jpg",
+      "creator": "Pratiti090",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "source": "https://commons.wikimedia.org/wiki/File%3AFarzad_Ali_Store%2C_Ross_Island%2C_Andaman.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "andaman-islands",
+      "folder": "andaman",
+      "path": "/photos/andaman/elephant-beach-boat.jpg",
+      "thumb": "/photos/andaman/elephant-beach-boat-sm.jpg",
+      "width": 1920,
+      "height": 1325,
+      "alt": "A boat off Elephant Beach, Havelock Island",
+      "place": "Elephant Beach or Neil Island",
+      "title": "Elephantbeach havelock andaman india.jpg",
+      "creator": "makemysaffar.com",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3AElephantbeach_havelock_andaman_india.jpg",
+      "changes": "Resized and cropped"
+    },
+    {
+      "dest": "kerala-backwaters",
+      "folder": "kerala",
+      "path": "/photos/kerala/alleppey-houseboats.jpg",
+      "thumb": "/photos/kerala/alleppey-houseboats-sm.jpg",
+      "width": 1920,
+      "height": 1280,
+      "alt": "Houseboats on the Alleppey backwaters at golden hour",
+      "place": "Alleppey backwaters and houseboat",
+      "title": "Alleppey Boat houses.jpg",
+      "creator": "Mohanrangaphotography",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3AAlleppey_Boat_houses.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "kerala-backwaters",
+      "folder": "kerala",
+      "path": "/photos/kerala/chinese-fishing-nets.jpg",
+      "thumb": "/photos/kerala/chinese-fishing-nets-sm.jpg",
+      "width": 1920,
+      "height": 1280,
+      "alt": "Chinese fishing nets at Fort Kochi",
+      "place": "Fort Kochi Chinese fishing nets",
+      "title": "Chinese Fishing Nets - 3.jpg",
+      "creator": "Ingo Mehling",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3AChinese_Fishing_Nets_-_3.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "kerala-backwaters",
+      "folder": "kerala",
+      "path": "/photos/kerala/athirappilly-falls.jpg",
+      "thumb": "/photos/kerala/athirappilly-falls-sm.jpg",
+      "width": 1920,
+      "height": 1437,
+      "alt": "Athirappilly Falls surrounded by forest",
+      "place": "Athirappilly Falls",
+      "title": "Athirappilly Waterfalls July 2022 P08.jpg",
+      "creator": "Vis M",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3AAthirappilly_Waterfalls_July_2022_P08.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "rishikesh-adventure",
+      "folder": "rishikesh",
+      "path": "/photos/rishikesh/ganga-and-hills.jpg",
+      "thumb": "/photos/rishikesh/ganga-and-hills-sm.jpg",
+      "width": 1920,
+      "height": 896,
+      "alt": "The Ganga at Rishikesh with a suspension bridge and hills",
+      "place": "Ganga valley view",
+      "title": "Scenic View of Rishikesh with Ganga River and Hills in Background.jpg",
+      "creator": "Vedrix",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3AScenic_View_of_Rishikesh_with_Ganga_River_and_Hills_in_Background.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "rishikesh-adventure",
+      "folder": "rishikesh",
+      "path": "/photos/rishikesh/triveni-ghat-aarti.jpg",
+      "thumb": "/photos/rishikesh/triveni-ghat-aarti-sm.jpg",
+      "width": 1920,
+      "height": 887,
+      "alt": "Evening Ganga aarti at Triveni Ghat",
+      "place": "Triveni Ghat Aarti",
+      "title": "Ganga Arti At Triveni Ghat In Rishikesh.jpg",
+      "creator": "Bhuvi Uniyal",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3AGanga_Arti_At_Triveni_Ghat_In_Rishikesh.jpg",
+      "changes": "Resized"
+    },
+    {
+      "dest": "rishikesh-adventure",
+      "folder": "rishikesh",
+      "path": "/photos/rishikesh/ganga-near-kaudiyala.jpg",
+      "thumb": "/photos/rishikesh/ganga-near-kaudiyala-sm.jpg",
+      "width": 1920,
+      "height": 1440,
+      "alt": "The Ganga flowing through a forested valley near Kaudiyala",
+      "place": "River rafting",
+      "title": "Ganga at Kaudiayala.jpg",
+      "creator": "Chakumar at English Wikipedia",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "source": "https://commons.wikimedia.org/wiki/File%3AGanga_at_Kaudiayala.jpg",
+      "changes": "Resized"
+    }
+  ]
+}

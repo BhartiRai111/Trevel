@@ -25,8 +25,8 @@ export function parseDestination(b: Record<string, unknown>): Destination | stri
   const bestTime = str(b.bestTime, 2, 60); if (!bestTime) return 'Enter the best time to visit.';
   const tagline = str(b.tagline, 2, 120); if (!tagline) return 'Enter a short tagline.';
   const about = str(b.about, 10, 1500); if (!about) return 'The about text needs 10 to 1500 characters.';
-  const image = str(b.img, 3, 300); if (!image) return 'Enter an image: an Unsplash photo id or a full https link.';
-  if (!/^(photo-[\w-]+|https:\/\/\S+)$/.test(image)) return 'Image must be an Unsplash id like "photo-123..." or a link starting with https://';
+  const image = typeof b.img === 'string' ? b.img.trim() : '';
+  if (image && !/^(photo-[\w-]+|\/photos\/[\w\-./]+|https:\/\/\S+)$/.test(image)) return 'Image must be a photo from /photos/, an Unsplash id like "photo-123..." or a link starting with https://';
   const highlights = Array.isArray(b.highlights) ? b.highlights.map(x => String(x).trim()).filter(Boolean).slice(0, 12) : [];
   if (!highlights.length) return 'Add at least one highlight.';
   const itinerary = Array.isArray(b.itinerary)
@@ -43,7 +43,7 @@ export function parseDestination(b: Record<string, unknown>): Destination | stri
 }
 
 const slugOk = (v: unknown) => (typeof v === 'string' && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(v) && v.length <= 80 ? v : null);
-const imgOk = (v: unknown) => { const t = str(v, 3, 300); return t && /^(photo-[\w-]+|https:\/\/\S+)$/.test(t) ? t : null; };
+const imgOk = (v: unknown) => { const t = str(v, 3, 300); return t && /^(photo-[\w-]+|\/photos\/[\w\-./]+|https:\/\/\S+)$/.test(t) ? t : null; };
 const lines = (v: unknown) => (Array.isArray(v) ? v : typeof v === 'string' ? v.split('\n') : []).map(x => String(x).trim()).filter(Boolean).slice(0, 20);
 
 /** Validates an admin form for a hotel, flight or car. Returns the clean item or an error message. */
@@ -57,7 +57,7 @@ export function parseCatalog(kind: Kind, b: Record<string, unknown>): Item | str
     const name = str(b.name, 2, 80), city = str(b.city, 2, 60), state = str(b.state, 2, 60), stars = int(b.stars, 1, 5), about = str(b.about, 10, 1000), img = imgOk(b.img);
     if (!name) return 'Enter the hotel name.'; if (!city) return 'Enter the city.'; if (!state) return 'Enter the state.';
     if (!stars) return 'Stars must be 1 to 5.'; if (!about) return 'The about text needs 10 to 1000 characters.';
-    if (!img) return 'Image must be an Unsplash id like "photo-123..." or a link starting with https://';
+    if (!img) return 'Image must be a photo from /photos/, an Unsplash id like "photo-123..." or a link starting with https://';
     const h: Hotel = { slug, name, city, state, stars, price, amenities: lines(b.amenities), about, img, active };
     return h;
   }
@@ -77,7 +77,7 @@ export function parseCatalog(kind: Kind, b: Record<string, unknown>): Item | str
   const type = typeof b.type === 'string' && CAR_TYPES.includes(b.type) ? b.type : null;
   if (!name) return 'Enter the car name.'; if (!city) return 'Enter the city.'; if (!type) return `Type must be one of: ${CAR_TYPES.join(', ')}.`;
   if (!seats) return 'Seats must be 1 to 60.'; if (!about) return 'The about text needs 10 to 1000 characters.';
-  if (!img) return 'Image must be an Unsplash id like "photo-123..." or a link starting with https://';
+  if (!img) return 'Image must be a photo from /photos/, an Unsplash id like "photo-123..." or a link starting with https://';
   const c: Car = { slug, name, type, city, seats, price, about, img, active };
   return c;
 }
@@ -132,6 +132,6 @@ export function parsePackages(v: unknown): Pkg[] | string {
 export function parseGallery(v: unknown): string[] | string {
   const raw = (Array.isArray(v) ? v : typeof v === 'string' ? v.split('\n') : []).map(x => String(x).trim()).filter(Boolean);
   if (raw.length > 8) return 'Use at most 8 background photos or videos.';
-  for (const x of raw) if (x.length > 300 || !/^(photo-[\w-]+|https:\/\/\S+)$/.test(x)) return `Background "${x.slice(0, 40)}": use an Unsplash photo id like "photo-123..." or a link starting with https://`;
+  for (const x of raw) if (x.length > 300 || !/^(photo-[\w-]+|\/photos\/[\w\-./]+|https:\/\/\S+)$/.test(x)) return `Background "${x.slice(0, 40)}": use a /photos/ file, an Unsplash photo id like "photo-123..." or a link starting with https://`;
   return [...new Set(raw)];
 }

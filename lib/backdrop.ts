@@ -34,7 +34,7 @@ export function pickBackdrop(path: string, sp: URLSearchParams, b: Backdrops, de
   else if (path === '/flights') text = sp.get('to');
   else if (path === '/search') text = sp.get('q');
   const d = matchDest(text, dests);
-  if (d && b.dest[d.slug]) return b.dest[d.slug];
+  if (d && b.dest[d.slug]?.length) return b.dest[d.slug];
   if (path.startsWith('/hotels') && b.hotels.length) return b.hotels;
   if (path.startsWith('/cars') && b.cars.length) return b.cars;
   return b.all;

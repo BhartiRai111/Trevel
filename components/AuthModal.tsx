@@ -29,7 +29,7 @@ export default function AuthModal() {
 
   return (
     <div className="modal" onMouseDown={e => { if (e.target === e.currentTarget) closeAuth(); }}>
-      <div className="sheet photo" style={{ ['--img' as string]: `url('${img('photo-1488646953014-85cb44e25828', 1000, 80)}')` }} role="dialog" aria-modal="true" aria-labelledby="lt">
+      <div className="sheet photo" style={{ ['--img' as string]: `url('${img('/photos/kerala/alleppey-houseboats.jpg', 1000, 80)}')` }} role="dialog" aria-modal="true" aria-labelledby="lt">
         <button className="x" type="button" aria-label="Close" onClick={closeAuth}>×</button>
         <h2 id="lt">{reg ? 'Create account' : forgot ? 'Reset password' : 'Welcome!'}</h2>
         <form onSubmit={submit} key={authMode}>

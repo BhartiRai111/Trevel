@@ -10,7 +10,7 @@ export default function DestinationCard({ d }: { d: Destination }) {
   return (
     <article className="card">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={img(d.img)} alt={`${d.name}, ${d.state}`} loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }} />
+      {d.img && <img src={img(d.img)} alt={`${d.name}, ${d.state}`} loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }} />}
       <span className="tag">{d.state}</span>
       <Link className="cl" href={`/destinations/${d.slug}`} aria-label={`${d.name}, ${d.days} days from ${inr(d.price)}`}>
         <div className="in">

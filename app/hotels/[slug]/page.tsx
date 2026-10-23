@@ -19,7 +19,7 @@ export default async function HotelPage({ params, searchParams }: Props) {
   const p = await readParams(searchParams);
   return (
     <main>
-      <section className="dhero photo" style={{ ['--img' as string]: `url('${img(h.img, 2000, 80)}')` }}>
+      <section className="dhero photo" style={{ ['--img' as string]: (h.img ? `url('${img(h.img, 2000, 80)}')` : 'none') }}>
         <div className="dh-in">
           <p className="eyebrow">{h.city}, {h.state}</p>
           <h1>{h.name}</h1>

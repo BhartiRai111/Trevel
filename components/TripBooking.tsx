@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
 import { GST_RATE, inr, quote } from '@/lib/pricing';
-import { img } from '@/lib/destinations';
+import { bg } from '@/lib/destinations';
 import { useSite } from './SiteProvider';
 
 type Pkg = { id: string; name: string; text: string; includes: string[]; price: number };
@@ -90,7 +90,7 @@ export default function TripBooking({ slug, name, state, days, img: image, packa
       </div>
 
       <aside className="panel bsum" aria-label="Price summary">
-        <div className="bs-top" style={{ backgroundImage: `url('${img(image, 500, 70)}'), linear-gradient(135deg,#0f8f86,#073a37)` }} role="img" aria-label={name}><span><b>{name}</b><br />{state} · {days} days</span></div>
+        <div className="bs-top" style={{ backgroundImage: bg(image, 500, 70) }} role="img" aria-label={name}><span><b>{name}</b><br />{state} · {days} days</span></div>
         <h2>Price summary</h2>
         <p className="muted small">{pkg.name} package{date ? ` · ${new Date(date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}` : ''}</p>
         <dl className="price">

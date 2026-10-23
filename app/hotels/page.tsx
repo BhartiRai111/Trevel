@@ -34,7 +34,7 @@ export default async function HotelsPage({ searchParams }: { searchParams: SP })
           const total = nights >= 1 ? quoteHotel(h.price, nights, rooms).total : 0;
           return (
             <li key={h.slug} className="rcard">
-              <div className="rimg" style={{ backgroundImage: `url('${img(h.img, 600, 70)}')` }} role="img" aria-label={h.name} />
+              <div className="rimg" style={{ backgroundImage: (h.img ? `url('${img(h.img, 600, 70)}')` : 'none') }} role="img" aria-label={h.name} />
               <div className="rbody">
                 <div><h2>{h.name}</h2><p className="muted">{h.city}, {h.state} · <span className="stars sm" aria-label={`${h.stars} star`}>{'★'.repeat(h.stars)}</span></p>
                   <p className="chips2">{h.amenities.slice(0, 4).map(a => <span key={a}>{a}</span>)}</p></div>

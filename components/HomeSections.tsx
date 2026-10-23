@@ -7,7 +7,7 @@ export async function Featured() {
   const d = (await getDestination('ladakh-leh')) ?? (await allDestinations(true))[0];
   if (!d) return null;
   return (
-    <section className="featured photo" id="featured" style={{ ['--img' as string]: `url('${img(d.img, 2000, 80)}')` }}>
+    <section className="featured photo" id="featured" style={{ ['--img' as string]: (d.img ? `url('${img(d.img, 2000, 80)}')` : 'none') }}>
       <div className="feat-in">
         <p className="eyebrow">Featured trip</p>
         <h2>{d.name}</h2>
@@ -52,7 +52,7 @@ export function Footer() {
   return (
     <footer>
       <Link className="logo" href="/">Roamora</Link>
-      <p>© 2026 Roamora. Prices in Indian rupees (₹).</p>
+      <p>© 2026 Roamora. Prices in Indian rupees (₹). <Link href="/credits">Photo credits</Link></p>
     </footer>
   );
 }

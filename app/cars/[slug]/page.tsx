@@ -19,7 +19,7 @@ export default async function CarPage({ params, searchParams }: Props) {
   const p = await readParams(searchParams);
   return (
     <main>
-      <section className="dhero photo" style={{ ['--img' as string]: `url('${img(c.img, 2000, 80)}')` }}>
+      <section className="dhero photo" style={{ ['--img' as string]: (c.img ? `url('${img(c.img, 2000, 80)}')` : 'none') }}>
         <div className="dh-in">
           <p className="eyebrow">{c.city} · {c.type}</p><h1>{c.name}</h1>
           <p className="facts"><span>Seats {c.seats}</span><span>Driver included</span><span>250 km per day</span></p>

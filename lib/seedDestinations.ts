@@ -1,3 +1,4 @@
+import photoData from './photoManifest.json';
 import { DEFAULT_PACKAGES, makeItinerary, type Destination, type Explore, type ExploreItem, type ExploreKind } from './destinations';
 
 /**
@@ -279,18 +280,21 @@ const GUIDE: Record<string, Guide> = {
   }
 };
 
-/* ---------- guide photos ----------
- * Places and activities have no photo of their own in the sample data, so their cards use the destination photo
- * (a wrong-place stock photo would be worse than a repeated right-place one). Food gets a generic plate or café photo.
- * Set a real photo per item in /admin. */
-const FOOD_IMG = 'photo-1504674900247-0877df9cc836', CAFE_IMG = 'photo-1495474472287-4d71bcdd2085';
-const pickImg = (kind: ExploreKind, type: string) => (kind === 'food' ? (type === 'Café' ? CAFE_IMG : FOOD_IMG) : '');
+/* ---------- photos ----------
+ * Real photographs from Wikimedia Commons, resized into public/photos by scripts/build-photos.mjs (credits: /credits).
+ * A place or activity only gets a photo if one that really shows it exists; otherwise its card is text only.
+ * Destinations without credited photos yet keep their previous image until photos with licence details are added. */
+type Plan = { hero: string; gallery: string[]; items: Record<string, string> };
+export const PHOTOS = (photoData as { dest: Record<string, Plan> }).dest;
 
 function buildExplore(d: Raw): Explore {
   const g = GUIDE[d.slug];
   if (!g) return { items: [], info: { howToReach: '', gettingAround: '', tips: [] } };
-  const items: ExploreItem[] = g.items.map(([kind, type, name, text]) => ({ kind, type, name, text, img: pickImg(kind, type) }));
+  const items: ExploreItem[] = g.items.map(([kind, type, name, text]) => ({ kind, type, name, text, img: PHOTOS[d.slug]?.items[name] ?? '' }));
   return { items, info: { howToReach: g.reach, gettingAround: g.around, tips: g.tips } };
 }
 
-export const SEED: Destination[] = RAW.map(d => ({ ...d, active: true, itinerary: makeItinerary(d), explore: buildExplore(d), packages: DEFAULT_PACKAGES, gallery: [] }));
+/** The image each destination had before local photos, to tell an untouched destination from one an admin changed. */
+export const ORIGINAL_IMG: Record<string, string> = Object.fromEntries(RAW.map(d => [d.slug, d.img]));
+
+export const SEED: Destination[] = RAW.map(d => ({ ...d, img: PHOTOS[d.slug]?.hero ?? '', active: true, itinerary: makeItinerary(d), explore: buildExplore(d), packages: DEFAULT_PACKAGES, gallery: PHOTOS[d.slug]?.gallery ?? [] }));
