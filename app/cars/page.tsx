@@ -4,6 +4,7 @@ import { CAR_TYPES, CITIES, searchCars } from '@/lib/catalog';
 import { img } from '@/lib/destinations';
 import { daysBetween, inr, quoteCar } from '@/lib/pricing';
 import { isDate, qs, readParams, type SP } from '@/lib/sp';
+import Shell from '@/components/Shell';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Cars with driver' };
@@ -14,8 +15,7 @@ export default async function CarsPage({ searchParams }: { searchParams: SP }) {
   const days = isDate(p.from) && isDate(p.to) ? daysBetween(p.from, p.to) + 1 : 0;
   const tomorrow = new Date(Date.now() + 864e5).toISOString().slice(0, 10);
   return (
-    <main className="page">
-      <h1 className="ph">Cars with driver</h1>
+    <Shell title="Cars with driver">
       <form className="sform" method="get">
         <label className="f"><span>Pick-up city</span><input name="city" defaultValue={p.city} list="cities" placeholder="Jaipur" autoComplete="off" /></label>
         <label className="f"><span>Pick-up date</span><input type="date" name="from" min={tomorrow} defaultValue={p.from} /></label>
@@ -38,6 +38,6 @@ export default async function CarsPage({ searchParams }: { searchParams: SP }) {
                 <Link className="btn btn-dark inline" href={`/cars/${c.slug}${qs({ from: p.from, to: p.to })}`}>View and book</Link></div>
             </div>
           </li>))}</ul>)}
-    </main>
+    </Shell>
   );
 }

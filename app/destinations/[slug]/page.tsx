@@ -33,9 +33,9 @@ function Explore({ d }: { d: Destination }) {
         <section key={g.id} id={g.id} className="xsec">
           <h2>{EXPLORE_KIND_LABEL[g.kind]} in {d.name}</h2>
           <div className="xgrid">
-            {g.list.map(i => (
+            {g.list.map((i, n) => (
               <article key={i.name} className="xcard">
-                <div className="xph" style={{ backgroundImage: `url('${img(i.img || d.img, 600, 70)}'), linear-gradient(135deg,#0f8f86,#073a37)` }} role="img" aria-label={i.name} />
+                <div className="xph" style={{ backgroundImage: `url('${img(i.img || d.img, 600, 70)}'), linear-gradient(135deg,#0f8f86,#073a37)`, ...(i.img ? {} : { backgroundSize: '170% auto, cover', backgroundPosition: `${[15, 85, 50, 25, 75, 40][n % 6]}% ${[30, 60, 20, 70, 40, 80][n % 6]}%, center` }) }} role="img" aria-label={i.name} />
                 <div className="xbody">{i.type && <span className="tag2">{i.type}</span>}<h3>{i.name}</h3><p>{i.text}</p></div>
               </article>
             ))}

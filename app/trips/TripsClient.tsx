@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { inr } from '@/lib/pricing';
 import DestinationCard from '@/components/DestinationCard';
 import { useSite } from '@/components/SiteProvider';
+import Shell from '@/components/Shell';
 
 type B = { id: number; ref: string; kind: string; href: string; slug: string; name: string; travel_date: string; end_date: string | null; travellers: number; total: number; status: string; share_token: string | null; can_review: boolean; reviewed: boolean };
 const KIND: Record<string, string> = { tour: 'Tour', hotel: 'Hotel', flight: 'Flight', car: 'Car' };
@@ -93,16 +94,15 @@ export default function TripsClient() {
     setReviewing(null); load();
   }
 
-  if (!ready) return <main className="page"><p>Loading…</p></main>;
+  if (!ready) return <Shell title="My trips"><p>Loading…</p></Shell>;
   if (!user) return (
-    <main className="page"><h1 className="ph">My trips</h1>
-      <div className="empty"><p>Log in to see your saved places and booking requests.</p><button className="btn btn-dark inline" type="button" onClick={() => openAuth('login')}>Log in</button></div></main>
+    <Shell title="My trips">
+      <div className="empty"><p>Log in to see your saved places and booking requests.</p><button className="btn btn-dark inline" type="button" onClick={() => openAuth('login')}>Log in</button></div></Shell>
   );
 
   const savedList = dests.filter(d => saved.has(d.slug));
   return (
-    <main className="page">
-      <h1 className="ph">My trips</h1>
+    <Shell title="My trips">
       <h2 className="sh">Bookings</h2>
       {msg && msg.t && <p className={`err dark${msg.ok ? ' okmsg' : ''}`} role="status">{msg.t}</p>}
       {bookings === null ? <p>Loading…</p> : bookings.length === 0
@@ -137,6 +137,6 @@ export default function TripsClient() {
       <h2 className="sh">Saved places</h2>
       {savedList.length ? <div className="cards">{savedList.map(d => <DestinationCard key={d.slug} d={d} />)}</div>
         : <div className="empty"><p>Tap the heart on any destination to save it here.</p></div>}
-    </main>
+    </Shell>
   );
 }

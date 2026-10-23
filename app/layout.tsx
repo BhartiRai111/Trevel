@@ -7,6 +7,11 @@ import VerifyBanner from '@/components/VerifyBanner';
 import { Footer } from '@/components/HomeSections';
 import { allDestinations } from '@/lib/repo';
 import { EMPTY_EXPLORE } from '@/lib/destinations';
+import { listItems } from '@/lib/catalog';
+import type { Car, Hotel } from '@/lib/catalogMeta';
+import type { Backdrops } from '@/lib/backdrop';
+import Backdrop from '@/components/Backdrop';
+import { Suspense } from 'react';
 
 // destinations come from the database, so pages are rendered per request
 export const dynamic = 'force-dynamic';
@@ -19,7 +24,17 @@ export const viewport: Viewport = { width: 'device-width', initialScale: 1, them
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // cards need only the short fields; the guide, plan and packages are loaded by the destination pages
-  const dests = (await allDestinations(true)).map(d => ({ ...d, about: '', itinerary: [], explore: EMPTY_EXPLORE, packages: [] }));
+  const full = await allDestinations(true);
+  const dests = full.map(d => ({ ...d, about: '', itinerary: [], explore: EMPTY_EXPLORE, packages: [], gallery: [] }));
+  const [hotels, cars] = await Promise.all([listItems<Hotel>('hotel'), listItems<Car>('car')]);
+  const uniq = (a: string[]) => [...new Set(a.filter(Boolean))];
+  const backdrops: Backdrops = {
+    dest: Object.fromEntries(full.map(d => [d.slug, uniq([d.img, ...d.gallery])])),
+    hotel: Object.fromEntries(hotels.map(h => [h.slug, [h.img]])),
+    car: Object.fromEntries(cars.map(c => [c.slug, [c.img]])),
+    hotels: uniq(hotels.map(h => h.img)).slice(0, 6), cars: uniq(cars.map(c => c.img)).slice(0, 6),
+    all: uniq(full.map(d => d.img)).slice(0, 6)
+  };
   return (
     <html lang="en-IN">
       <head>
@@ -29,7 +44,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
       <body>
-        <SiteProvider dests={dests}>
+        <SiteProvider dests={dests} backdrops={backdrops}>
+          <Suspense fallback={null}><Backdrop /></Suspense>
           <Navbar />
           {children}
           <Footer />

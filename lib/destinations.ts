@@ -20,6 +20,8 @@ export type Destination = {
   explore: Explore;
   /** booking options (Standard, Comfort, Premium); prices are the destination price times `mult` */
   packages: Pkg[];
+  /** extra photos or videos of places in this destination, used with `img` as the animated page background */
+  gallery: string[];
 };
 
 export type ExploreKind = 'see' | 'food' | 'do';

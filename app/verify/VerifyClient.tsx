@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useSite } from '@/components/SiteProvider';
+import Shell from '@/components/Shell';
 
 export default function VerifyClient() {
   const token = useSearchParams().get('token') ?? '';
@@ -21,8 +22,8 @@ export default function VerifyClient() {
   }, [token, refresh]);
 
   return (
-    <main className="page"><h1 className="ph">Verify email</h1>
+    <Shell title="Verify email">
       <div className="empty">{res ? <><p role="status">{res.msg}</p><Link className="btn btn-dark inline" href={res.ok ? '/search' : '/'}>{res.ok ? 'Find a trip' : 'Go home'}</Link></> : <p>Checking your link…</p>}</div>
-    </main>
+    </Shell>
   );
 }

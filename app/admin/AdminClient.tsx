@@ -5,15 +5,16 @@ import { DEFAULT_PACKAGES, TYPE_LABEL, type Destination } from '@/lib/destinatio
 import { inr } from '@/lib/pricing';
 import { useSite } from '@/components/SiteProvider';
 import CatalogAdmin from './CatalogAdmin';
+import Shell from '@/components/Shell';
 
 type Bk = { id: number; ref: string; kind: string; package: string | null; notes: string | null; trip: string | null; end_date: string | null; slug: string; travel_date: string; travellers: number; name: string; phone: string; email: string; total: number; status: string };
 type Stat = { status: string; n: number; amount: number };
 type Rv = { id: number; slug: string; rating: number; text: string; hidden: number; name: string };
 type Em = { id: number; to_addr: string; subject: string; body: string; status: string; error: string | null; created_at: number };
-type Form = { isNew: boolean; slug: string; name: string; state: string; type: string; days: string; price: string; bestTime: string; tagline: string; about: string; img: string; active: boolean; highlights: string; itinerary: string; guide: string; reach: string; around: string; tips: string; packages: string };
+type Form = { isNew: boolean; slug: string; name: string; state: string; type: string; days: string; price: string; bestTime: string; tagline: string; about: string; img: string; active: boolean; highlights: string; itinerary: string; guide: string; gallery: string; reach: string; around: string; tips: string; packages: string };
 
 const toForm = (d: Destination): Form => ({ isNew: false, slug: d.slug, name: d.name, state: d.state, type: d.type, days: String(d.days), price: String(d.price), bestTime: d.bestTime, tagline: d.tagline, about: d.about, img: d.img, active: d.active, highlights: d.highlights.join('\n'), itinerary: d.itinerary.map(i => `${i.title} | ${i.text}`).join('\n'),
-  guide: d.explore.items.map(i => [i.kind, i.type, i.name, i.text, i.img].join(' | ')).join('\n'), reach: d.explore.info.howToReach, around: d.explore.info.gettingAround, tips: d.explore.info.tips.join('\n'),
+  gallery: d.gallery.join('\n'), guide: d.explore.items.map(i => [i.kind, i.type, i.name, i.text, i.img].join(' | ')).join('\n'), reach: d.explore.info.howToReach, around: d.explore.info.gettingAround, tips: d.explore.info.tips.join('\n'),
   packages: d.packages.map(p => [p.name, p.mult, p.text, p.includes.join('; ')].join(' | ')).join('\n') });
 const waText = (b: Bk) => {
   const t = b.trip ?? b.slug, f = b.name.split(/\s+/)[0];
@@ -23,7 +24,7 @@ const waText = (b: Bk) => {
   return `Hi ${f}, this is Roamora about your booking request ${b.ref} for ${t} on ${d}.`;
 };
 const wa = (b: Bk) => `https://wa.me/91${b.phone}?text=${encodeURIComponent(waText(b))}`;
-const blank: Form = { isNew: true, slug: '', name: '', state: '', type: 'heritage', days: '3', price: '10000', bestTime: '', tagline: '', about: '', img: '', active: true, highlights: '', itinerary: '', guide: '', reach: '', around: '', tips: '', packages: DEFAULT_PACKAGES.map(p => [p.name, p.mult, p.text, p.includes.join('; ')].join(' | ')).join('\n') };
+const blank: Form = { isNew: true, slug: '', name: '', state: '', type: 'heritage', days: '3', price: '10000', bestTime: '', tagline: '', about: '', img: '', active: true, highlights: '', itinerary: '', gallery: '', guide: '', reach: '', around: '', tips: '', packages: DEFAULT_PACKAGES.map(p => [p.name, p.mult, p.text, p.includes.join('; ')].join(' | ')).join('\n') };
 
 export default function AdminClient() {
   const { user, ready, openAuth } = useSite();
@@ -58,6 +59,7 @@ export default function AdminClient() {
       ...form, days: Number(form.days), price: Number(form.price),
       highlights: form.highlights.split('\n'),
       itinerary: form.itinerary.split('\n').filter(l => l.trim()).map(l => { const [t, ...r] = l.split('|'); return { title: t, text: r.join('|') }; }),
+      gallery: form.gallery.split('\n'),
       explore: {
         items: form.guide.split('\n').filter(l => l.trim()).map(l => {
           const p = l.split('|').map(x => x.trim()); const hasImg = p.length >= 5;
@@ -83,17 +85,16 @@ export default function AdminClient() {
     loadR();
   }
 
-  if (!ready) return <main className="page"><p>Loading…</p></main>;
-  if (!user) return <main className="page"><h1 className="ph">Admin</h1><div className="empty"><p>Log in with an admin account.</p><button className="btn btn-dark inline" type="button" onClick={() => openAuth('login')}>Log in</button></div></main>;
-  if (!user.isAdmin) return <main className="page"><h1 className="ph">Admin</h1><div className="empty"><p>This page is only for Roamora admins.</p></div></main>;
+  if (!ready) return <Shell title="Admin"><p>Loading…</p></Shell>;
+  if (!user) return <Shell title="Admin"><div className="empty"><p>Log in with an admin account.</p><button className="btn btn-dark inline" type="button" onClick={() => openAuth('login')}>Log in</button></div></Shell>;
+  if (!user.isAdmin) return <Shell title="Admin"><div className="empty"><p>This page is only for Roamora admins.</p></div></Shell>;
 
   const stat = (s: string) => stats.find(x => x.status === s);
   const set = (k: keyof Form, v: string | boolean) => setForm(f => f && { ...f, [k]: v });
   const shown = bookings.filter(b => filter === 'all' || b.status === filter);
 
   return (
-    <main className="page wide">
-      <h1 className="ph">Admin</h1>
+    <Shell title="Admin" wide>
       <div className="kpis">
         <div><b>{stat('requested')?.n ?? 0}</b><span>Waiting for you</span></div>
         <div><b>{stat('confirmed')?.n ?? 0}</b><span>Confirmed, unpaid</span></div>
@@ -137,6 +138,9 @@ export default function AdminClient() {
           <label className="f"><span>Image (Unsplash photo id or https link)</span><input value={form.img} onChange={e => set('img', e.target.value)} required /></label>
           <label className="f"><span>Highlights (one per line)</span><textarea rows={4} value={form.highlights} onChange={e => set('highlights', e.target.value)} required /></label>
           <label className="f"><span>Day by day (one line per day: Title | Description)</span><textarea rows={6} value={form.itinerary} onChange={e => set('itinerary', e.target.value)} required /></label>
+          <h3 className="fh">Animated page background</h3>
+          <label className="f"><span>Extra photos or videos of places here (one per line: Unsplash id or https link; .mp4 or .webm for video)</span><textarea rows={3} value={form.gallery} onChange={e => set('gallery', e.target.value)} placeholder={'photo-123456789\nhttps://example.com/baga-beach.jpg'} /></label>
+          <p className="muted small">The main image above plus these play as the full-screen background on this destination&apos;s pages. Use real photos of places in this destination.</p>
           <h3 className="fh">Explore guide (shown on the destination page)</h3>
           <label className="f"><span>Places, food and activities. One per line: kind | type | name | description | image (optional)</span><textarea rows={8} value={form.guide} onChange={e => set('guide', e.target.value)} placeholder={'see | Beach | Palolem Beach | A calm crescent bay… | photo-123\nfood | Local food | Fish curry | A tangy coconut curry…\ndo | Activity | River cruise | An evening boat ride…'} /></label>
           <p className="muted small">kind is <b>see</b> (places), <b>food</b> or <b>do</b> (things to do). Leave the image empty to use the destination photo.</p>
@@ -171,6 +175,6 @@ export default function AdminClient() {
       {tab === 'reviews' && (reviews.length === 0 ? <div className="empty"><p>No reviews yet.</p></div> : <ul className="rev admin">{reviews.map(r => (
         <li key={r.id}><div><span className="stars sm">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span> <b>{r.name}</b> on <i>{r.slug}</i> {r.hidden ? <span className="st cancelled">hidden</span> : null}</div><p>{r.text}</p>
           <button className="linkbtn" type="button" onClick={() => hideReview(r)}>{r.hidden ? 'Show again' : 'Hide from website'}</button></li>))}</ul>)}
-    </main>
+    </Shell>
   );
 }

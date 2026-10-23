@@ -37,7 +37,9 @@ export function parseDestination(b: Record<string, unknown>): Destination | stri
   if (typeof explore === 'string') return explore;
   const packages = b.packages === undefined ? DEFAULT_PACKAGES : parsePackages(b.packages);
   if (typeof packages === 'string') return packages;
-  return { slug, name, state, type, days, price, bestTime, tagline, about, highlights, itinerary, img: image, active: b.active !== false, explore, packages };
+  const gallery = b.gallery === undefined ? [] : parseGallery(b.gallery);
+  if (typeof gallery === 'string') return gallery;
+  return { slug, name, state, type, days, price, bestTime, tagline, about, highlights, itinerary, img: image, active: b.active !== false, explore, packages, gallery };
 }
 
 const slugOk = (v: unknown) => (typeof v === 'string' && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(v) && v.length <= 80 ? v : null);
@@ -124,4 +126,12 @@ export function parsePackages(v: unknown): Pkg[] | string {
     out.push({ id, name, text, mult: Math.round(mult * 100) / 100, includes });
   }
   return out;
+}
+
+/** Background photos or videos for a destination: Unsplash ids or https links (video links end in .mp4 or .webm). */
+export function parseGallery(v: unknown): string[] | string {
+  const raw = (Array.isArray(v) ? v : typeof v === 'string' ? v.split('\n') : []).map(x => String(x).trim()).filter(Boolean);
+  if (raw.length > 8) return 'Use at most 8 background photos or videos.';
+  for (const x of raw) if (x.length > 300 || !/^(photo-[\w-]+|https:\/\/\S+)$/.test(x)) return `Background "${x.slice(0, 40)}": use an Unsplash photo id like "photo-123..." or a link starting with https://`;
+  return [...new Set(raw)];
 }

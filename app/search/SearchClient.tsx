@@ -5,6 +5,7 @@ import { TYPE_LABEL, type DestType } from '@/lib/destinations';
 import { inr } from '@/lib/pricing';
 import DestinationCard from '@/components/DestinationCard';
 import { useSite } from '@/components/SiteProvider';
+import Shell from '@/components/Shell';
 
 export default function SearchClient() {
   const { dests } = useSite();
@@ -33,8 +34,7 @@ export default function SearchClient() {
   const toggle = (t: DestType) => setTypes(a => a.includes(t) ? a.filter(x => x !== t) : [...a, t]);
 
   return (
-    <main className="page">
-      <h1 className="ph">Find your destination</h1>
+    <Shell title="Find your destination">
       <div className="layout">
         <aside className="filt" aria-label="Filters">
           <label className="f"><span>Search</span><input type="search" value={q} onChange={e => setQ(e.target.value)} placeholder="Goa, Ladakh, Rajasthan…" /></label>
@@ -63,6 +63,6 @@ export default function SearchClient() {
             : <div className="empty"><p>No destinations match these filters.</p><button className="btn btn-dark inline" type="button" onClick={clear}>Clear filters</button></div>}
         </section>
       </div>
-    </main>
+    </Shell>
   );
 }

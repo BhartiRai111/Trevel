@@ -5,7 +5,7 @@ import { DEFAULT_PACKAGES, makeItinerary, type Destination, type Explore, type E
  * Everything here is SAMPLE information written for demonstration. It is not verified live data:
  * no ratings, no restaurant prices, no availability. Check opening times, permits and prices before you go.
  */
-type Raw = Omit<Destination, 'itinerary' | 'active' | 'explore' | 'packages'>;
+type Raw = Omit<Destination, 'itinerary' | 'active' | 'explore' | 'packages' | 'gallery'>;
 
 const RAW: Raw[] = [
   { slug: 'ladakh-leh', name: 'Leh Ladakh', state: 'Ladakh', type: 'mountain', days: 7, price: 32000, bestTime: 'Jun to Sep', img: 'photo-1626015365107-2cfd4e8e3e19',
@@ -279,27 +279,18 @@ const GUIDE: Record<string, Guide> = {
   }
 };
 
-/* ---------- placeholder photos by category (replace per item in /admin) ---------- */
-const POOL: Record<string, string> = {
-  beach: 'photo-1507525428034-b723cf961d3e', mountain: 'photo-1464822759023-fed622ff2c3b', peaks: 'photo-1506905925346-21bda4d32df4',
-  lake: 'photo-1501785888041-af3ef285b470', heritage: 'photo-1477587458883-47145ed94245', backwater: 'photo-1602216056096-3b40cc0c9944',
-  food: 'photo-1504674900247-0877df9cc836', cafe: 'photo-1495474472287-4d71bcdd2085', hike: 'photo-1551632811-561732d1e306', road: 'photo-1469854523086-cc02fe5d8800'
-};
-const TYPE_POOL: Record<string, string> = {
-  Beach: 'beach', Island: 'beach', Lake: 'lake', Waterfall: 'lake', River: 'lake', Backwaters: 'backwater', Valley: 'mountain', Hill: 'mountain', Viewpoint: 'peaks', Pass: 'peaks',
-  'Local food': 'food', Restaurant: 'food', 'Café': 'cafe', Activity: 'hike', Village: 'mountain', Springs: 'mountain', 'Tea estate': 'mountain', Railway: 'heritage', Garden: 'mountain'
-};
-const pickImg = (type: string, destImg: string, first: boolean) => (first ? destImg : POOL[TYPE_POOL[type] ?? 'heritage']);
+/* ---------- guide photos ----------
+ * Places and activities have no photo of their own in the sample data, so their cards use the destination photo
+ * (a wrong-place stock photo would be worse than a repeated right-place one). Food gets a generic plate or café photo.
+ * Set a real photo per item in /admin. */
+const FOOD_IMG = 'photo-1504674900247-0877df9cc836', CAFE_IMG = 'photo-1495474472287-4d71bcdd2085';
+const pickImg = (kind: ExploreKind, type: string) => (kind === 'food' ? (type === 'Café' ? CAFE_IMG : FOOD_IMG) : '');
 
 function buildExplore(d: Raw): Explore {
   const g = GUIDE[d.slug];
   if (!g) return { items: [], info: { howToReach: '', gettingAround: '', tips: [] } };
-  let seenFirst = false;
-  const items: ExploreItem[] = g.items.map(([kind, type, name, text]) => {
-    const first = kind === 'see' && !seenFirst; if (first) seenFirst = true;
-    return { kind, type, name, text, img: pickImg(type, d.img, first) };
-  });
+  const items: ExploreItem[] = g.items.map(([kind, type, name, text]) => ({ kind, type, name, text, img: pickImg(kind, type) }));
   return { items, info: { howToReach: g.reach, gettingAround: g.around, tips: g.tips } };
 }
 
-export const SEED: Destination[] = RAW.map(d => ({ ...d, active: true, itinerary: makeItinerary(d), explore: buildExplore(d), packages: DEFAULT_PACKAGES }));
+export const SEED: Destination[] = RAW.map(d => ({ ...d, active: true, itinerary: makeItinerary(d), explore: buildExplore(d), packages: DEFAULT_PACKAGES, gallery: [] }));

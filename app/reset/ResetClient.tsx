@@ -2,6 +2,7 @@
 import { useState, type FormEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useSite } from '@/components/SiteProvider';
+import Shell from '@/components/Shell';
 
 export default function ResetClient() {
   const token = useSearchParams().get('token') ?? '';
@@ -22,7 +23,7 @@ export default function ResetClient() {
   }
 
   return (
-    <main className="page"><h1 className="ph">Choose a new password</h1>
+    <Shell title="Choose a new password">
       {done ? <div className="empty"><p role="status">Password changed. You were logged out everywhere, so please log in again.</p><button className="btn btn-dark inline" type="button" onClick={() => openAuth('login')}>Log in</button></div>
         : <form className="aform" onSubmit={submit}>
           <label className="f"><span>New password (min 8 characters)</span><input name="password" type="password" minLength={8} autoComplete="new-password" required /></label>
@@ -30,6 +31,6 @@ export default function ResetClient() {
           {err && <p className="err dark" role="alert">{err}</p>}
           <button className="btn btn-dark inline" type="submit" disabled={busy}>{busy ? 'Saving…' : 'Change password'}</button>
         </form>}
-    </main>
+    </Shell>
   );
 }

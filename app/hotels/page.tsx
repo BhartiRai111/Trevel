@@ -4,6 +4,7 @@ import { CITIES, searchHotels } from '@/lib/catalog';
 import { img } from '@/lib/destinations';
 import { daysBetween, hotelGstRate, inr, quoteHotel } from '@/lib/pricing';
 import { isDate, qs, readParams, type SP } from '@/lib/sp';
+import Shell from '@/components/Shell';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Hotels' };
@@ -15,8 +16,7 @@ export default async function HotelsPage({ searchParams }: { searchParams: SP })
   const guests = Math.min(15, Math.max(1, Number(p.guests) || 2)), rooms = Math.ceil(guests / 3);
   const tomorrow = new Date(Date.now() + 864e5).toISOString().slice(0, 10);
   return (
-    <main className="page">
-      <h1 className="ph">Hotels</h1>
+    <Shell title="Hotels">
       <form className="sform" method="get">
         <label className="f"><span>Destination or hotel</span><input name="city" defaultValue={p.city} list="cities" placeholder="Goa, Jaipur…" autoComplete="off" /></label>
         <label className="f"><span>Check-in</span><input type="date" name="checkin" min={tomorrow} defaultValue={p.checkin} /></label>
@@ -47,6 +47,6 @@ export default async function HotelsPage({ searchParams }: { searchParams: SP })
               </div>
             </li>);
         })}</ul>)}
-    </main>
+    </Shell>
   );
 }

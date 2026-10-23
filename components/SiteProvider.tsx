@@ -1,5 +1,6 @@
 'use client';
 import type { Destination } from '@/lib/destinations';
+import type { Backdrops } from '@/lib/backdrop';
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 
 export type User = { id: number; name: string; email: string; phone: string; isAdmin: boolean; emailVerified: boolean };
@@ -7,6 +8,7 @@ type AuthMode = 'login' | 'register' | 'forgot' | null;
 
 type Ctx = {
   dests: Destination[];
+  backdrops: Backdrops;
   user: User | null;
   mailEnabled: boolean;
   ready: boolean;
@@ -27,7 +29,7 @@ export function useSite() {
   return c;
 }
 
-export default function SiteProvider({ children, dests }: { children: ReactNode; dests: Destination[] }) {
+export default function SiteProvider({ children, dests, backdrops }: { children: ReactNode; dests: Destination[]; backdrops: Backdrops }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const [mailEnabled, setMailEnabled] = useState(false);
@@ -71,7 +73,7 @@ export default function SiteProvider({ children, dests }: { children: ReactNode;
   }, [user, saved, refresh]);
 
   return (
-    <SiteContext.Provider value={{ dests, user, mailEnabled, ready, saved, authMode, openAuth: (m = 'login') => setAuthMode(m), closeAuth: () => setAuthMode(null), refresh, logout, toggleSave }}>
+    <SiteContext.Provider value={{ dests, backdrops, user, mailEnabled, ready, saved, authMode, openAuth: (m = 'login') => setAuthMode(m), closeAuth: () => setAuthMode(null), refresh, logout, toggleSave }}>
       {children}
     </SiteContext.Provider>
   );

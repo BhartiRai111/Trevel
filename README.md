@@ -24,12 +24,17 @@ Needs Node 20.9 or newer.
 - **Cars with driver** (`/cars`): search by city, dates and type. Rate per day (driver, fuel and tolls for 250 km a day included) plus 5% GST.
 - Every booking is a request: `requested` → `confirmed` by you → `paid`. Prices are always recalculated on the server. All four kinds show up in My trips, in emails and in the admin booking list.
 
+**Animated background on every page**
+- Every page except the home page (which has its own slideshow) has a full-screen animated background: slow zoom and pan, photos fading into each other, under a teal gradient. Content sits on a light panel below a title band. It switches off when the visitor has "reduce motion" turned on.
+- It follows the place: a destination page uses that destination's photos (Goa shows Goa, Manali shows Manali and so on, including its booking page); hotel and car pages use their own photo; hotel, car, flight and tour searches that name a place (for example `?city=goa`) use that destination; other pages rotate through the destination photos.
+- To show more than one location, add photos or videos in **Admin > Tours > Edit > Animated page background** (one per line: an Unsplash photo id or an https link; links ending in `.mp4` or `.webm` play as video). Use real photos of places in that destination. Up to 8 per destination.
+
 **Destination guide and booking page**
 - Click any destination card (home page or Tours) to open its page: places to see, food and cafés, things to do, visitor information (best time, how to reach, getting around, tips), day-by-day plan and reviews. Each of the 12 destinations has its own content.
 - **Book This Trip** (in the page header, in the price card and in a bar at the bottom on phones) opens `/destinations/[slug]/book`: choose a Standard, Comfort or Premium package, dates, travellers, traveller details and special requests, with a live price breakdown (package price × travellers + 5% GST).
 - Submitting uses the same booking workflow as everything else: saved as a request, shown in My Trips and Admin (with the package and the note), confirmation email sent, then confirm → pay.
 - **Package prices** are the destination price times a multiplier (Standard ×1, Comfort ×1.4, Premium ×1.9 by default), so changing the destination price in Admin updates every package.
-- **Everything in the guide is sample information**, shown with a notice on each page. Edit it in Admin > Tours (one line per place: `kind | type | name | description | image`). Photos in the sample guide are placeholders by category; set a real photo per item in Admin. Use `see`, `food` or `do` as the kind.
+- **Everything in the guide is sample information**, shown with a notice on each page. Edit it in Admin > Tours (one line per place: `kind | type | name | description | image`). Places and activities use the destination photo until you set a real photo per item in Admin (a stand-in stock photo of the wrong place would be worse). Food items use a generic plate or café photo. Use `see`, `food` or `do` as the kind.
 
 **Travellers**
 - Search and filter destinations; destination pages with highlights, a day-by-day plan, reviews and a live price breakdown (base + 5% GST + ₹0 fee = total).

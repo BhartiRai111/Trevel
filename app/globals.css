@@ -381,3 +381,36 @@ footer p{font-size:14px;opacity:.8}
 .f textarea,.bstep textarea{border:2px solid #cfe5e2;border-radius:12px;padding:10px 12px;width:100%;color:var(--ink);background:#fff;resize:vertical}
 /* keep a sans-serif fallback on every control if Poppins has not loaded */
 input,select,textarea,button,.f input,.f select,.f textarea,.search input,.search select,.field input,.news input,.linkbox,.rform textarea,.aform textarea,.bar2 select,.step output{font-family:Poppins,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+
+/* ---------- full-screen animated background on every page ---------- */
+/* only body has a background, so it becomes the page canvas and the fixed layer paints above it */
+body{background:#073a37}
+.section{background:var(--bg)}
+.backdrop{position:fixed;inset:0;z-index:-1;overflow:hidden;background:#073a37;pointer-events:none}
+.backdrop::after{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,rgba(7,58,55,.55),rgba(15,143,134,.5) 45%,rgba(7,58,55,.9))}
+.bd{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background-size:cover;background-position:center;opacity:0;transition:opacity 1.8s ease;will-change:transform,opacity}
+.bd.on{opacity:1}
+.bd-zoom{animation:bdzoom 26s ease-in-out infinite alternate}
+.bd-panl{animation:bdpanl 30s ease-in-out infinite alternate}
+.bd-rise{animation:bdrise 28s ease-in-out infinite alternate}
+.bd-panr{animation:bdpanr 30s ease-in-out infinite alternate}
+@keyframes bdzoom{from{transform:scale(1)}to{transform:scale(1.16)}}
+@keyframes bdpanl{from{transform:scale(1.16) translateX(3%)}to{transform:scale(1.16) translateX(-3%)}}
+@keyframes bdpanr{from{transform:scale(1.16) translateX(-3%)}to{transform:scale(1.16) translateX(3%)}}
+@keyframes bdrise{from{transform:scale(1.18) translateY(3%)}to{transform:scale(1.06) translateY(-2%)}}
+@media(prefers-reduced-motion:reduce){.bd{animation:none!important;transition:none}}
+
+/* title band shows the background; the content sits on a light panel below it */
+.pagewrap{position:relative}
+.phead{max-width:1280px;margin:0 auto;padding:112px var(--pad) 56px;color:#fff}
+.pagewrap.wide .phead{max-width:1360px}
+.phead h1{font-size:clamp(32px,5vw,54px);line-height:1.08;margin:0;text-shadow:0 2px 24px rgba(0,0,0,.3);text-wrap:balance}
+.phead .crumbs{color:rgba(255,255,255,.85);margin:0 0 8px}
+.phead .crumbs a{color:#fff}
+.page{background:rgba(243,250,249,.96);border-radius:28px 28px 0 0;padding-top:32px;box-shadow:0 -14px 44px rgba(0,0,0,.2)}
+.detail{background:rgba(243,250,249,.96);border-radius:28px 28px 0 0;margin:-28px auto 0;position:relative;box-shadow:0 -14px 44px rgba(0,0,0,.2)}
+
+/* hero bands on destination, hotel, car and flight pages are see-through so the animated background shows */
+.dhero.photo{background:none}
+.dhero::before,.dhero.fl::before{display:none}
+.dhero::after,.dhero.fl::after{background:linear-gradient(180deg,rgba(7,58,55,.12),rgba(7,58,55,.5))}

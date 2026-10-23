@@ -75,6 +75,8 @@ const SCHEMA = `
   ALTER TABLE bookings ADD COLUMN IF NOT EXISTS notes TEXT;
   ALTER TABLE destinations ADD COLUMN IF NOT EXISTS explore TEXT NOT NULL DEFAULT '';
   ALTER TABLE destinations ADD COLUMN IF NOT EXISTS packages TEXT NOT NULL DEFAULT '';
+  ALTER TABLE destinations ADD COLUMN IF NOT EXISTS gallery TEXT NOT NULL DEFAULT '';
+  CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
   CREATE TABLE IF NOT EXISTS reviews (
     id SERIAL PRIMARY KEY, booking_id INTEGER NOT NULL UNIQUE REFERENCES bookings(id) ON DELETE CASCADE,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, slug TEXT NOT NULL, rating INTEGER NOT NULL,
@@ -128,10 +130,24 @@ async function init(): Promise<Backend> {
     await b.tx(async c => {
       for (const [i, x] of SEED.entries())
         await c.run(
-          'INSERT INTO destinations (slug,name,state,type,days,price,best_time,tagline,about,highlights,itinerary,img,active,sort,explore,packages) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,1,$13,$14,$15) ON CONFLICT (slug) DO NOTHING',
-          [x.slug, x.name, x.state, x.type, x.days, x.price, x.bestTime, x.tagline, x.about, JSON.stringify(x.highlights), JSON.stringify(x.itinerary), x.img, i, JSON.stringify(x.explore), JSON.stringify(x.packages)]
+          'INSERT INTO destinations (slug,name,state,type,days,price,best_time,tagline,about,highlights,itinerary,img,active,sort,explore,packages,gallery) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,1,$13,$14,$15,$16) ON CONFLICT (slug) DO NOTHING',
+          [x.slug, x.name, x.state, x.type, x.days, x.price, x.bestTime, x.tagline, x.about, JSON.stringify(x.highlights), JSON.stringify(x.itinerary), x.img, i, JSON.stringify(x.explore), JSON.stringify(x.packages), JSON.stringify(x.gallery)]
         );
     });
+  }
+  // one-time: the first guide version gave places stock photos by category (a Jaipur palace on a Goa fort card). Clear those so cards use the destination photo.
+  const migrated = await b.query("SELECT 1 FROM meta WHERE key = 'guide-photos-v2'");
+  if (!migrated.rows.length) {
+    const OLD = new Set(['photo-1507525428034-b723cf961d3e', 'photo-1464822759023-fed622ff2c3b', 'photo-1506905925346-21bda4d32df4', 'photo-1501785888041-af3ef285b470', 'photo-1477587458883-47145ed94245', 'photo-1602216056096-3b40cc0c9944', 'photo-1551632811-561732d1e306', 'photo-1469854523086-cc02fe5d8800']);
+    const rows = (await b.query("SELECT slug, img, explore FROM destinations WHERE explore <> ''")).rows;
+    for (const r of rows) {
+      try {
+        const ex = JSON.parse(r.explore as string); let changed = false;
+        for (const it of ex.items ?? []) if (it.kind !== 'food' && it.img && (OLD.has(it.img) || it.img === r.img)) { it.img = ''; changed = true; }
+        if (changed) await b.query('UPDATE destinations SET explore = $1 WHERE slug = $2', [JSON.stringify(ex), r.slug]);
+      } catch { /* leave a row we cannot read untouched */ }
+    }
+    await b.query("INSERT INTO meta (key, value) VALUES ('guide-photos-v2', '1') ON CONFLICT (key) DO NOTHING");
   }
   // databases from before the guide pages: fill the sample guide and packages for rows that still have none (edited rows are never touched)
   for (const x of SEED) await b.query("UPDATE destinations SET explore = $1, packages = $2 WHERE slug = $3 AND explore = ''", [JSON.stringify(x.explore), JSON.stringify(x.packages), x.slug]);

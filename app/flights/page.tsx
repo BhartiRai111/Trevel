@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { arrival, CITIES, DAY_NAMES, fmtDuration, searchFlights } from '@/lib/catalog';
 import { inr, quoteFlight } from '@/lib/pricing';
 import { isDate, qs, readParams, type SP } from '@/lib/sp';
+import Shell from '@/components/Shell';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Flights' };
@@ -16,8 +17,7 @@ export default async function FlightsPage({ searchParams }: { searchParams: SP }
   const tomorrow = new Date(Date.now() + 864e5).toISOString().slice(0, 10);
   const same = !!p.from && p.from.toLowerCase() === (p.to ?? '').toLowerCase();
   return (
-    <main className="page">
-      <h1 className="ph">Flights</h1>
+    <Shell title="Flights">
       <form className="sform" method="get">
         <label className="f"><span>From</span><input name="from" defaultValue={p.from} list="cities" placeholder="Delhi" autoComplete="off" /></label>
         <label className="f"><span>To</span><input name="to" defaultValue={p.to} list="cities" placeholder="Goa" autoComplete="off" /></label>
@@ -50,6 +50,6 @@ export default async function FlightsPage({ searchParams }: { searchParams: SP }
               {!date && <p className="muted small fdays">Runs {f.days.length === 7 ? 'daily' : f.days.map(d => DAY_NAMES[d]).join(', ')}</p>}
             </li>);
         })}</ul>)}
-    </main>
+    </Shell>
   );
 }
